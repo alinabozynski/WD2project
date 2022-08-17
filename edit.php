@@ -12,10 +12,17 @@
     $initial_statement2 = $db->prepare($initial_query2);
     $initial_statement->execute();
     $initial_statement2->execute();
+
+    $emp_commments_query = "SELECT * from emp_comments";
+    $dept_comments_query = "SELECT * from dept_comments";
+    $emp_comment_statement = $db->prepare($emp_commments_query);
+    $dept_comment_statement = $db->prepare($dept_comments_query);
+    $emp_comment_statement->execute();
+    $dept_comment_statement->execute();
     
     // UPDATE blog if title, content and id are present in POST.
     // Used when user submits the form 
-    if($_POST && isset($_GET['emp_id']) && $_POST['first_name'] != "" && $_POST['last_name'] != "" && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email']) && $_POST['department_id'] != "Select a Department ID"){
+    if($_POST && isset($_GET['emp_id']) && !empty($_POST['first_name']) && !empty($_POST['last_name']) && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email']) && $_POST['department_id'] != "Select a Department ID"){
         // Sanitize user input to escape HTML entities and filter out dangerous characters.
         $emp_id = filter_input(INPUT_GET, 'emp_id', FILTER_SANITIZE_NUMBER_INT);
         $first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -40,7 +47,7 @@
         // Redirect after update.
         header("Location: details.php?emp_id={$_GET['emp_id']}");
 
-    } elseif($_POST && isset($_GET['department_id']) && $_POST['department_name'] != "" && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
+    } elseif($_POST && isset($_GET['department_id']) && !empty($_POST['department_name']) && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
         $department_id = filter_input(INPUT_GET, 'department_id', FILTER_SANITIZE_NUMBER_INT);
         $department_name = filter_input(INPUT_POST, 'department_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $tel_number = filter_input(INPUT_POST, 'tel_number', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -138,9 +145,8 @@
     <?php if(!isset($_GET['emp_id']) && !isset($_GET['department_id'])): ?>
         <p>No record selected.</p>
     <?php else: ?>
-        <form method="post" action="edit.php?<?php echo isset($_GET['emp_id']) ? "emp_id=".$_GET['emp_id'] : "department_id=".$_GET['department_id'] ?>">
-
-            <?php if(isset($_GET['emp_id'])): ?>
+        <?php if(isset($_GET['emp_id'])): ?>
+            <form method="post" action="edit.php?<?php echo isset($_GET['emp_id']) ? "emp_id=".$_GET['emp_id'] : "department_id=".$_GET['department_id'] ?>">
                 <label for="first_name">First Name: </label>
                 <input id="first_name" name="first_name" value="<?= $employee['first_name'] ?>">
                 <label for="last_name">Last Name: </label>
@@ -157,11 +163,32 @@
                     <?php endwhile ?>
                 </select>
                 <input type="submit" class="submit" value="Update Record">
+            </form>
                 <?php if($employee['image_file'] != null): ?>
                     <p><img src="uploads/<?= $employee['image_file'] ?>" alt="<?= $employee['image_file'] ?>" title="<?= $employee['image_file'] ?>" height="300"></p>
                     <p><a href="image_removal.php?emp_id=<?= $employee['emp_id'] ?>">Remove image from this record</a></p>
                 <?php endif ?>
-            <?php elseif(isset($_GET['department_id'])): ?>
+
+            <form method="post" action="delete.php?emp_id=<?= $_GET['emp_id'] ?>">
+                <input type="submit" class="submit" value="Delete Record">
+            </form>
+
+            <?php while($comments = $emp_comment_statement->fetch()): ?>
+                <?php if($comments['emp_id'] == $_GET['emp_id']): ?>
+                    <div>
+                        <p><?= $comments['created'] ?></p>
+                        <p><?= $comments['comment'] ?></p>
+                        <form method="POST" action="details.php?emp_id=<?= $_GET['emp_id'] ?>&comm_id=<?= $comments['comm_id'] ?>">
+                            <input type="submit" class="submit" name="delete_comment" value="Delete Comment">
+                        </form>
+                        <form method="POST" action="details.php?emp_id=<?= $_GET['emp_id'] ?>&comm_id=<?= $comments['comm_id'] ?>">
+                            <input type="submit" class="submit" name="disemvowel_comment" value="Disemvowel Comment">
+                        </form>
+                    </div>
+            <?php endif ?>
+        <?php endwhile ?>
+
+        <?php elseif(isset($_GET['department_id'])): ?>
                 <label for="department_name">Department Name: </label>
                 <input id="department_name" name="department_name" value="<?= $department['department_name'] ?>">
                 <label for="tel_number">Phone Number: </label>
@@ -169,16 +196,31 @@
                 <label for="email">Email: </label>
                 <input id="email" name="email" value="<?= $department['email'] ?>" size=35>
                 <input type="submit" class="submit" value="Update Record">
+            </form>
                 <?php if($department['image_file'] != null): ?>
                     <p><img src="uploads/<?= $department['image_file'] ?>" alt="<?= $department['image_file'] ?>" title="<?= $department['image_file'] ?>" height="300"></p>
                     <p><a href="image_removal.php?department_id=<?= $department['department_id'] ?>">Remove image from this record</a></p>
                 <?php endif ?>
-            <?php endif ?>
-        </form>
+            <form method="post" action="delete.php?department_id=<?= $_GET['department_id'] ?>">
+                <input type="submit" class="submit" value="Delete Record">
+            </form>
 
-        <form method="post" action="delete.php?<?php echo isset($_GET['emp_id']) ? "emp_id=".$_GET['emp_id'] : "department_id=".$_GET['department_id'] ?>">
-            <input type="submit" class="submit" value="Delete Record">
-        </form>
+            <?php while($comments = $dept_comment_statement->fetch()): ?>
+                <?php if($comments['department_id'] == $_GET['department_id']): ?>
+                    <div>
+                        <p><?= $comments['created'] ?></p>
+                        <p><?= $comments['comment'] ?></p>
+                        <form method="POST" action="details.php?department_id=<?= $_GET['department_id'] ?>&comm_id=<?= $comments['comm_id'] ?>">
+                            <input type="submit" class="submit" name="delete_comment" value="Delete Comment">
+                        </form>
+                        <form method="POST" action="details.php?department_id=<?= $_GET['department_id'] ?>&comm_id=<?= $comments['comm_id'] ?>">
+                            <input type="submit" class="submit" name="disemvowel_comment" value="Disemvowel Comment">
+                        </form>
+                    </div>
+                <?php endif ?>
+            <?php endwhile ?>
+
+        <?php endif ?>
     
     <?php endif ?>
 </body>

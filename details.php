@@ -11,6 +11,78 @@
     $emp_comment_statement->execute();
     $dept_comment_statement->execute(); 
 
+    if(isset($_POST['delete_comment']) && isset($_GET['comm_id']) && isset($_GET['emp_id'])){
+        $comm_id = filter_input(INPUT_GET, 'comm_id', FILTER_SANITIZE_NUMBER_INT);
+
+        $query = "DELETE FROM emp_comments WHERE comm_id = :comm_id LIMIT 1";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':comm_id', $comm_id, PDO::PARAM_INT);
+        $statement->execute();
+
+        header("Location: details.php?emp_id={$_GET['emp_id']}");
+        exit();
+    } elseif(isset($_POST['delete_comment']) && isset($_GET['comm_id']) && isset($_GET['department_id'])){
+        $comm_id = filter_input(INPUT_GET, 'comm_id', FILTER_SANITIZE_NUMBER_INT);
+
+        $query = "DELETE FROM dept_comments WHERE comm_id = :comm_id LIMIT 1";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':comm_id', $comm_id, PDO::PARAM_INT);
+        $statement->execute();
+
+        header("Location: details.php?department_id={$_GET['department_id']}");
+        exit();
+    } 
+
+    if(isset($_POST['disemvowel_comment']) && isset($_GET['comm_id']) && isset($_GET['emp_id'])){
+        $comm_id = filter_input(INPUT_GET, 'comm_id', FILTER_SANITIZE_NUMBER_INT);
+        $query = "SELECT * FROM emp_comments WHERE comm_id = :comm_id LIMIT 1";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':comm_id', $comm_id, PDO::PARAM_INT);
+        $statement->execute();
+        $info = $statement->fetch();
+        $comment = $info['comment'];
+        $disemvoweled = str_replace(array('a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'), '', $comment);
+
+        $new_query = "UPDATE emp_comments SET comment = :disemvoweled WHERE comm_id = :comm_id LIMIT 1";
+        $new_statement = $db->prepare($new_query);
+        $new_statement->bindValue(':disemvoweled', $disemvoweled);
+        $new_statement->bindValue(':comm_id', $comm_id);
+        $new_statement->execute();
+
+        header("Location: details.php?emp_id={$_GET['emp_id']}");
+        exit();
+    } elseif(isset($_POST['disemvowel_comment']) && isset($_GET['comm_id']) && isset($_GET['department_id'])) {
+        $comm_id = filter_input(INPUT_GET, 'comm_id', FILTER_SANITIZE_NUMBER_INT);
+        $query = "SELECT * FROM dept_comments WHERE comm_id = :comm_id LIMIT 1";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':comm_id', $comm_id, PDO::PARAM_INT);
+        $statement->execute();
+        $info = $statement->fetch();
+        $comment = $info['comment'];
+        $disemvoweled = str_replace(array('a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'), '', $comment);
+
+        $new_query = "UPDATE dept_comments SET comment = :disemvoweled WHERE comm_id = :comm_id LIMIT 1";
+        $new_statement = $db->prepare($new_query);
+        $new_statement->bindValue(':comment', $disemvoweled);
+        $new_statement->bindValue(':comm_id', $comm_id);
+        $new_statement->execute();
+
+        header("Location: details.php?department_id={$_GET['department_id']}");
+        exit();
+    } elseif(isset($_GET['comm_id']) && isset($_GET['emp_id'])){
+        $comm_id = filter_input(INPUT_GET, 'comm_id', FILTER_SANITIZE_NUMBER_INT);
+        $query = "SELECT * FROM emp_comments WHERE comm_id = :comm_id LIMIT 1";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':comm_id', $comm_id, PDO::PARAM_INT);
+        $statement->execute();
+    } elseif(isset($_GET['comm_id']) && isset($_GET['department_id'])){
+        $comm_id = filter_input(INPUT_GET, 'comm_id', FILTER_SANITIZE_NUMBER_INT);
+        $query = "SELECT * FROM dept_comments WHERE comm_id = :comm_id LIMIT 1";
+        $statement = $db->prepare($query);
+        $statement->bindValue(':comm_id', $comm_id, PDO::PARAM_INT);
+        $statement->execute();
+    }
+
     // Check if comment form was submitted and if a comment has been entered.
     if(isset($_POST['add_comment']) && !empty($_POST['comment'])){
 
@@ -30,7 +102,7 @@
             $statement->execute(); 
 
             // Display message to show the user that the record addition was successful.
-                
+                    
             header("Location: details.php?emp_id={$_GET['emp_id']}");
 
         } elseif(isset($_GET['department_id'])){
@@ -49,14 +121,13 @@
             $statement->execute(); 
 
             // Display message to show the user that the record addition was successful.
-            
+                
             header("Location: details.php?department_id={$_GET['department_id']}");
         }
 
-    } elseif(isset($_POST['add_comment'])){
-
+    } elseif(isset($_POST['add_comment']) && empty($_POST['comment'])){
         echo "ATTENTION: Comment could not be added. Please ensure the comment is not blank.";
-    }    
+    } 
 
     if(isset($_GET['emp_id'])){
         // Sanitize the id GET parameter.
@@ -127,6 +198,7 @@
         <title><?= $employee['first_name'] ?> <?= $employee['last_name'] ?></title>
         <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Shadows+Into+Light&family=Space+Mono' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" type="text/css" href="blog.css" />
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
     <body>
         <section>
@@ -148,15 +220,15 @@
         <form method="POST" action="details.php?emp_id=<?= $_GET['emp_id'] ?>">
             <h3>Add comments about this employee</h3>
             <label for="comment">Comments</label>
-            <input type="text" id="comment" name="comment">
+            <input type="text" id="comment" name="comment" value="<?php echo isset($_POST['comment']) ? $_POST['comment'] : ''; ?>">
             <input type="submit" class="submit" name="add_comment" value="Add Comment">
         </form>
 
         <?php while($comments = $emp_comment_statement->fetch()): ?>
             <?php if($comments['emp_id'] == $_GET['emp_id']): ?>
                 <div>
-                    <p><?= $comments['comment'] ?></p>
                     <p><?= $comments['created'] ?></p>
+                    <p><?= $comments['comment'] ?></p>
                 </div>
             <?php endif ?>
         <?php endwhile ?>
@@ -196,15 +268,15 @@
         <form method="POST" action="details.php?department_id=<?= $_GET['department_id'] ?>">
             <h3>Add comments about this department</h3>
             <label for="comment">Comments</label>
-            <input type="text" id="comment" name="comment">
+            <input type="text" id="comment" name="comment" value="<?php echo isset($_POST['comment']) ? $_POST['comment'] : ''; ?>">
             <input type="submit" class="submit" name="add_comment" value="Add Comment">
         </form>
 
         <?php while($comments = $dept_comment_statement->fetch()): ?>
             <?php if($comments['department_id'] == $_GET['department_id']): ?>
                 <div>
-                    <p><?= $comments['comment'] ?></p>
                     <p><?= $comments['created'] ?></p>
+                    <p><?= $comments['comment'] ?></p>
                 </div>
             <?php endif ?>
         <?php endwhile ?>
