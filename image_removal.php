@@ -1,8 +1,9 @@
-<!-- DELETES a specified record as per the user's request. -->
+<!-- Removes an image from a specific record as per the user's request. -->
 <?php
+    // Require the connection to the database for this page
     require('connect.php');
     
-    // Remove image from the uploads folder and the selected record once user selects the image removal link.
+    // Remove image from the uploads folder and the selected record once user selects the image removal link on edit.php
     if (isset($_GET['emp_id'])) {
         // Sanitize $_GET['id'] to filter out dangerous characters.
         $emp_id = filter_input(INPUT_GET, 'emp_id', FILTER_SANITIZE_NUMBER_INT);
@@ -69,10 +70,6 @@
 
         exit;
 
-    } else{
-        // When not DELETING
-        $emp_id = false; 
-        $department_id = false;
     }
 ?>
 <!DOCTYPE html>
@@ -81,6 +78,7 @@
     <title>Delete Record</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Space+Mono' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="blog.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
     <section>

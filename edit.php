@@ -1,11 +1,12 @@
-<!-- UPDATES a specified existing blog post, replacing the current title and content values
-    with the new values that are altered by the user when submitting the form. -->
+<!-- UPDATES a specified existing employee or department record, replacing the current 
+        values with user input. -->
 <?php
+    // Require the connection to the database for this page
     require('connect.php');
 
-    $emp_id = 0;
-    $department_id = 0;
-
+    // Display the departments (twice) when an employee record is being added 
+    // Once to display a list of the department names and department ids (to choose
+    //  an ID in the form), and a second query to display the deparment IDs in the form
     $initial_query = "SELECT * FROM departments";
     $initial_query2 = "SELECT * FROM departments";
     $initial_statement = $db->prepare($initial_query);
@@ -13,6 +14,7 @@
     $initial_statement->execute();
     $initial_statement2->execute();
 
+    // Retrieve both comments table data to display any matches for the selected record
     $emp_commments_query = "SELECT * from emp_comments";
     $dept_comments_query = "SELECT * from dept_comments";
     $emp_comment_statement = $db->prepare($emp_commments_query);
@@ -20,7 +22,7 @@
     $emp_comment_statement->execute();
     $dept_comment_statement->execute();
     
-    // UPDATE blog if title, content and id are present in POST.
+    // UPDATE record if user input is valid.
     // Used when user submits the form 
     if($_POST && isset($_GET['emp_id']) && !empty($_POST['first_name']) && !empty($_POST['last_name']) && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email']) && $_POST['department_id'] != "Select a Department ID"){
         // Sanitize user input to escape HTML entities and filter out dangerous characters.
@@ -31,7 +33,7 @@
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $department_id = filter_input(INPUT_POST, 'department_id', FILTER_VALIDATE_INT);
 
-        // Build the parameterized SQL query and bind to the above sanitized values.
+        // Build and prepare the parameterized SQL query and bind to the above sanitized values.
         $query = "UPDATE employees SET first_name = :first_name, last_name = :last_name, tel_number = :tel_number, email = :email, department_id = :department_id WHERE emp_id = :emp_id LIMIT 1";
         $statement = $db->prepare($query);
         $statement->bindValue(':first_name', $first_name);        
@@ -48,12 +50,13 @@
         header("Location: details.php?emp_id={$_GET['emp_id']}");
 
     } elseif($_POST && isset($_GET['department_id']) && !empty($_POST['department_name']) && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
+        // Sanitize user input to escape HTML entities and filter out dangerous characters.
         $department_id = filter_input(INPUT_GET, 'department_id', FILTER_SANITIZE_NUMBER_INT);
         $department_name = filter_input(INPUT_POST, 'department_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $tel_number = filter_input(INPUT_POST, 'tel_number', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
-        // Build the parameterized SQL query and bind to the above sanitized values.
+        // Build and prepare the parameterized SQL query and bind to the above sanitized values.
         $query = "UPDATE departments SET department_name = :department_name, tel_number = :tel_number, email = :email WHERE department_id = :department_id LIMIT 1";
         $statement = $db->prepare($query);
         $statement->bindValue(':department_name', $department_name);        
@@ -67,38 +70,34 @@
         // Redirect after update.
         header("Location: details.php?department_id={$_GET['department_id']}");
 
-        //header("Location: edit.php?id={$id}");
-
-        // Grab record to be updated (if id GET parameter exists in the URL).
+    // Grab record to be updated if id in the URL.
     } elseif(isset($_GET['emp_id'])){ 
 
         // Sanitize $_GET['emp_id'].
         $emp_id = filter_input(INPUT_GET, 'emp_id', FILTER_SANITIZE_NUMBER_INT);
 
-        // Build the parametrized SQL query using the filtered value.
+        // Build and prepare the parametrized SQL query and bind to the above sanitized values.
         $query = "SELECT * FROM employees WHERE emp_id = :emp_id LIMIT 1";
 
         $statement = $db->prepare($query);
 
-        // Bind the :id parameter in the query to the sanitized id value.
-        // $id specifies an Integer binding-type.
         $statement->bindValue('emp_id', $emp_id, PDO::PARAM_INT);
 
         // Execute the SELECT and fetch the single row returned.
         $statement->execute();
 
-        // Only grabbing one row, so the fetch is here, (otherwise it would be looped through in the html)
         $employee = $statement->fetch();
 
         if($_POST){
-            echo "Update failed. Ensure all content is valid. No fields should be left blank, the phone number must be 11 digits long and starting with 1(204), and the email should be a valid email address ending in '@VROAR.com'.";
+            echo "Update failed.";
         }
     } elseif(isset($_GET['department_id'])){
-        // Sanitize $_GET['department_name'].
+        // Sanitize $_GET['department_id'].
         $department_id = filter_input(INPUT_GET, 'department_id', FILTER_SANITIZE_NUMBER_INT);
 
-        // Build the parametrized SQL query using the filtered value.
+        // Build and prepare the parameterized SQL query and bind to the above sanitized values.
         $query = "SELECT * FROM departments WHERE department_id = :department_id LIMIT 1";
+
         $statement = $db->prepare($query);
 
         $statement->bindValue('department_id', $department_id);
@@ -109,13 +108,9 @@
         $department = $statement->fetch();
 
         if($_POST){
-            echo "Update failed. Ensure all content is valid. No fields should be left blank, the phone number must be 11 digits long and starting with 1(204), and the email should be a valid email address ending in '@VROAR.com'.";
+            echo "Update failed.";
         }
 
-    } else {
-        // When not UPDATING or SELECTING
-        $emp_id = false;
-        $department_id = false;
     }
 ?>
 <!DOCTYPE html>

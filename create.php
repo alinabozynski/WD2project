@@ -1,8 +1,11 @@
-<!-- CREATES a blog post, inserting the title and content values the user 
-     entered when submitting the form. -->
+<!-- CREATES a new employee or department record post with user input. -->
 <?php
+    // Require the connection to the database for this page
     require('connect.php');
 
+    // Display the departments (twice) when an employee record is being added 
+    // Once to display a list of the department names and department ids (to choose
+    //  an ID in the form), and a second query to display the deparment IDs in the form
     $initial_query = "SELECT * FROM departments";
     $initial_query2 = "SELECT * FROM departments";
     $initial_statement = $db->prepare($initial_query);
@@ -16,46 +19,63 @@
         // Validate user input
         function filterinput(){
 
-            // Create a variable for errors with an inital value of 0
-            $errors=0;
+            // Create a variable for errors defaulted to false
+            $errors = false;
 
             if($_GET['type'] == "employee"){
-                if(strlen($_POST['first_name']) <= 0){
-                    $errors += 1;
+
+                // Ensure first and last name fields are not empty
+                if(empty($_POST['first_name'])){
+                    $errors = true;
                 }
-                if(strlen($_POST['last_name']) <= 0){
-                    $errors += 1;
-                }
-                if(!preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number'])){
-                    $errors += 1;
-                }
-                if(!preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
-                    $errors += 1;
-                }
-                if($_POST['department_id'] == "Select a Department ID"){
-                    $errors += 1;
+                if(empty($_POST['last_name'])){
+                    $errors = true;
                 }
 
+                // Validate the phone number, which must start with some form of 1204
+                if(!preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number'])){
+                    $errors = true;
+                }
+
+                // Ensure the email is a company email
+                if(!preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
+                    $errors = true;
+                }
+
+                // Ensure a department was selected
+                if($_POST['department_id'] == "Select a Department ID"){
+                    $errors = true;
+                }
+
+                // Returns true is the form has errors.
                 return $errors;
 
             } elseif($_GET['type'] == "department"){
-                if(strlen($_POST['department_name']) <= 0){
-                    $errors += 1;
-                }
-                if(!preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number'])){
-                    $errors += 1;
-                }
-                if(!preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
-                    $errors += 1;
+                // Ensure department name field is not empty
+                if(empty($_POST['department_name'])){
+                    $errors = true;
                 }
 
+                // Validate the phone number, which must start with some form of 1204
+                if(!preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number'])){
+                    $errors = true;
+                }
+
+                // Ensure the email is a company email
+                if(!preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
+                    $errors = true;
+                }
+
+                // Returns true is the form has errors.
                 return $errors;
             }
         }
         
-        if(filterinput() != 0){
+        // If the form has errors, display an error message
+        if(filterinput()){
             echo "ATTENTION: " . ucfirst($_GET['type']) . " record could not be added. Please ensure all data is valid. No fields should be left as their defaults or blank, the phone number must be 11 digits long and starting with 1(204), and the email should be a valid email address ending in '@VROAR.com'.";
 
+        // If there were no errors, create the new employee or department record.
         } else {
             if($_GET['type'] == "employee"){
                 // Sanitize user input to filter out dangerous characters and make sure 
@@ -77,9 +97,8 @@
 
                 // Execute the INSERT statement.
                 $statement->execute(); 
-
-                // Display message to show the user that the record addition was successful.
                 
+                // Redirect after insert. 
                 header("Location: login.php");
 
             } elseif($_GET['type'] == "department"){
@@ -98,9 +117,8 @@
 
                 // Execute the INSERT statement.
                 $statement->execute(); 
-
-                // Display message to show the user that the record addition was successful.
                 
+                // Redirect after insert. 
                 header("Location: login.php");
             }
         }
@@ -112,6 +130,7 @@
     <title>New Blog Post</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Space+Mono' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="blog.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
     <section>

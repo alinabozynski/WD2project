@@ -1,18 +1,27 @@
 <!-- Uses SQL to display a list of the employees and departments. 
-     Provides the necessary links for the user to view the details of each. --> 
+     Provides the necessary links for the user to view the details of each. 
+     Users also have the option to search results by a keyword. --> 
 <?php  
+    // Require the connection to the database for this page
     require('connect.php');
 
-    // Build SQL String and prepare PDO::Statement from the query.
-    $query = "SELECT * FROM employees ORDER BY last_name";
-    $query2 = "SELECT * FROM departments ORDER BY department_name";
+    // If the user has entered a keyword to search the database for 
+    if(isset($_POST['search_request'])){
+        $keyword =
 
-    $statement = $db->prepare($query);
-    $statement2 = $db->prepare($query2);
+    // If no keyword has been searched for, set and use a default ORDER BY value
+    } else {
+        // Build SQL String and prepare PDO::Statement from the query.
+        $query = "SELECT * FROM employees ORDER BY last_name";
+        $query2 = "SELECT * FROM departments ORDER BY department_name";
 
-    // Execute() on the DB server.
-    $statement->execute(); 
-    $statement2->execute();
+        $statement = $db->prepare($query);
+        $statement2 = $db->prepare($query2);
+
+        // Execute() on the DB server.
+        $statement->execute(); 
+        $statement2->execute();
+    }
 
 ?>
 <!DOCTYPE html>
@@ -37,23 +46,35 @@
         <input type="password" id="password2" name="password2">
         <input type="submit" class="submit" value="Create User" name="new_user">
     </form>
-    
-    <section>
-        <h3>Seach for contact information by Employee name:</h3>
-        <ul>
-            <?php while($row = $statement->fetch()): ?>
-                <li><a href="details.php?emp_id=<?= $row['emp_id'] ?>"><?= $row['last_name'] ?>, <?= $row['first_name'] ?></a></li>
-            <?php endwhile ?>
-        </ul>
-    </section>
 
-    <section>
-        <h3>Seach for contact information by category with Department names:</h3>
-        <ul>
-            <?php while($row = $statement2->fetch()): ?>
-                <li><a href="details.php?department_id=<?= $row['department_id'] ?>"><?= $row['department_name'] ?></a></li>
-            <?php endwhile ?>
-        </ul>
-    </section>
+    <form method="POST" action="index.php">
+        <label for="search">Search by keyword</label>
+        <input type="text" id="search" name="search">
+        <input type="submit" class="submit" name="search_request" value="Search">
+    </form>
+
+    <?php if(isset($_POST['search_request'])): ?>
+        <?php if(): ?>
+        <?php else: ?>
+        <?php endif ?>
+    <?php else: ?>
+        <section>
+            <h3>Seach for contact information by Employee name:</h3>
+            <ul>
+                <?php while($row = $statement->fetch()): ?>
+                    <li><a href="details.php?emp_id=<?= $row['emp_id'] ?>"><?= $row['last_name'] ?>, <?= $row['first_name'] ?></a></li>
+                <?php endwhile ?>
+            </ul>
+        </section>
+
+        <section>
+            <h3>Seach for contact information by category with Department names:</h3>
+            <ul>
+                <?php while($row = $statement2->fetch()): ?>
+                    <li><a href="details.php?department_id=<?= $row['department_id'] ?>"><?= $row['department_name'] ?></a></li>
+                <?php endwhile ?>
+            </ul>
+        </section>
+    <?php endif ?>
 </body>
 </html> 

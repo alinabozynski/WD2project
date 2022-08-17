@@ -1,30 +1,37 @@
+<!-- The Admin landing page after logging in. --> 
 <?php
+    // Require the connection to the database if it does not exist already (while exploring the website and coming back to this page)
     if(!@require('connect.php')){
         require('connect.php');
     }
 
+    // If the user has entered a sort to be used for the data display
     if(isset($_POST['sort_request'])){
         $sort = $_POST['sort'];
 
+        // Sort by last_name
         if($sort == "last_name"){
             $e_order = "last_name";
             $d_order = "department_name";
 
+        // Sort by first_name
         } elseif($sort == "first_name"){
             $e_order = "first_name";
             $d_order = "department_name";
 
+        // Sort by the creation date of the records
         } elseif($sort == "created_date"){
             $e_order = "created DESC";
             $d_order = "created DESC";
 
+        // Sort by the last updated date of the records
         } elseif($sort == "updated_date"){
             $e_order = "updated DESC";
             $d_order = "updated DESC";
 
         }
 
-    // Default order by value
+    // Specify the default ORDER BY value
     } elseif(!isset($_POST['sort_request'])) {
         $e_order = "last_name";
         $d_order = "department_name";
@@ -53,11 +60,12 @@
     <header>
         <h1><a href="index.php">VROAR Inc.</a> - <a href="login.php">Administration Home Page</a></h1>
 
+        <h3><a href="login_data.php">View Login Data</a></h3>
+
         <form method="POST" action="login.php">
             <input type="submit" class="submit" name="logout" value="Logout">
         </form>
 
-        <h3><a href="login_data.php">View Login Data</a></h3>
         <h3>Data Management</h3>
     </header>
     <div>
@@ -85,7 +93,7 @@
     </div>
     <div>
         <ul>
-            <li><b>Edit or Delete a current employee record</b></li>
+            <li><b>Edit or Delete a current employee record and comments</b></li>
             <?php while($row = $statement->fetch()): ?>
                 <li><a href="edit.php?emp_id=<?= $row['emp_id'] ?>"><?= $row['last_name'] ?>, <?= $row['first_name'] ?></a></li>
             <?php endwhile ?>
@@ -93,7 +101,7 @@
     </div>
     <div>
         <ul>
-            <li><b>Edit or Delete a current department record</b></li>
+            <li><b>Edit or Delete a current department record and comments</b></li>
             <?php while($row = $statement2->fetch()): ?>
                 <li><a href="edit.php?department_id=<?= $row['department_id'] ?>"><?= $row['department_name'] ?></a></li>
             <?php endwhile ?>

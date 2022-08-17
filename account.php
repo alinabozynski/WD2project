@@ -1,11 +1,14 @@
-<!-- UPDATES a specified existing blog post, replacing the current title and content values
-    with the new values that are altered by the user when submitting the form. -->
+<!-- UPDATES a specified account, replacing the current username and password
+    with the new values that are entered by the user when submitting the form. -->
 <?php
+    // Require the connection to the database for this page
     require('connect.php');
 
-    // UPDATE blog if title, content and id are present in POST.
+    // UPDATE login account if username and password fields are present in POST.
     // Used when user submits the form 
     if($_POST && isset($_GET['username']) && isset($_POST['username']) && isset($_POST['password1']) && isset($_POST['password2'])){
+
+        // Check if passwords match
         function filterinput(){
             $errors = false;
 
@@ -19,9 +22,11 @@
             return $errors;
         }
 
+        // If the passwords do not match, display the error.
         if(filterinput() == true){
             echo "Password fields must match.";
 
+            // Ensure username is still displayed in the form
             $username = filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING);
 
             // Build the parametrized SQL query using the filtered value.
@@ -29,17 +34,19 @@
 
             $statement = $db->prepare($query);
 
-            // Bind the :id parameter in the query to the sanitized id value.
-            // $id specifies an Integer binding-type.
+            // Bind the :username parameter in the query to the sanitized username value.
             $statement->bindValue(':username', $username);
 
-            // Execute the SELECT and fetch the single row returned.
+            // Execute the SELECT and fetch the returned row.
             $statement->execute();
 
-            // Only grabbing one row, so the fetch is here, (otherwise it would be looped through in the html)
+            // Only grabbing one row, so the fetch is here instead of in the HTML
             $login = $statement->fetch();
 
+        // If both password fields match
         } else {
+
+            // Try to update the account with the user's entered values.
             try {
                 // Retrieve account id
                 $username = filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING);
@@ -50,17 +57,18 @@
                 $login = $statement1->fetch();
                 $id = $login['id'];
 
-                // Try inserting user data to MySQL.
+                // Try inserting user data to MySQL
                 $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
                 $og_password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
+                // Salt and hash the entered password
                 $options = [
                     'salt' => "78302huirlys8t9420hjgif",
                 ];
 
                 $password = password_hash($og_password, PASSWORD_BCRYPT, $options);
-// Warning: password_hash(): The "salt" option has been ignored, since providing a custom salt is no longer supported
 
+                // Perform the update
                 $query = "UPDATE logins SET username = :username, password = :password WHERE id = :id LIMIT 1";
                 $statement = $db->prepare($query); 
                 $statement->bindValue(':username', $username);
@@ -68,11 +76,14 @@
                 $statement->bindValue(':id', $id, PDO::PARAM_INT);
                 $statement->execute();
 
+                // Redirect after update
                 header("Location: login_data.php");
 
+            // If the query does not execute, the username already exists. So, display the error.
             } catch (PDOException $e) {
                 print "Error: '" . $_POST['username'] . "' already exists. Please choose a different username.";
 
+                // Ensure username is still displayed in the form
                 $username = filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING);
 
                 // Build the parametrized SQL query using the filtered value.
@@ -80,44 +91,40 @@
 
                 $statement = $db->prepare($query);
 
-                // Bind the :id parameter in the query to the sanitized id value.
-                // $id specifies an Integer binding-type.
+                // Bind the :username parameter in the query to the sanitized username value.
                 $statement->bindValue(':username', $username);
 
                 // Execute the SELECT and fetch the single row returned.
                 $statement->execute();
 
-                // Only grabbing one row, so the fetch is here, (otherwise it would be looped through in the html)
+                // Grab the row
                 $login = $statement->fetch();
             }
         }
 
+    // Grab account to be updated username is in the URL
     } elseif(isset($_GET['username'])){ 
 
-        // Sanitize $_GET['emp_id'].
+        // Sanitize $_GET['username'] to use in the query.
         $username = filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING);
 
         // Build the parametrized SQL query using the filtered value.
         $query = "SELECT * FROM logins WHERE username = :username LIMIT 1";
 
+        // Prepare the parameterized SQL query
         $statement = $db->prepare($query);
 
-        // Bind the :id parameter in the query to the sanitized id value.
-        // $id specifies an Integer binding-type.
+        // Bind the :username parameter in the query to the sanitized username value.
         $statement->bindValue(':username', $username, PDO::PARAM_INT);
 
         // Execute the SELECT and fetch the single row returned.
         $statement->execute();
 
-        // Only grabbing one row, so the fetch is here, (otherwise it would be looped through in the html)
         $login = $statement->fetch();
 
         if($_POST){
-            echo "Update failed. Ensure both passwords match";
+            echo "Update failed.";
         }
-    } else {
-        // When not UPDATING or SELECTING
-        $username = false;
     }
 ?>
 <!DOCTYPE html>
@@ -126,6 +133,7 @@
     <title><?= $_GET['username'] ?></title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Space+Mono' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="blog.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
     <section>

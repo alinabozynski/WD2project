@@ -1,8 +1,12 @@
+<!-- Uses SESSIONS to log a user in and out of the website. --> 
 <?php  
  
+    // Start a session to keep track of when a user is logged in.
     SESSION_START();
 
+    // If the user has requested to log in 
     if(isset($_POST['login'])){
+        // Require the connection to the database 
         require('connect.php');
 
         // Retrieve the row in MySQL with the entered username.
@@ -13,18 +17,26 @@
         $statement->execute();
         $row = $statement->fetch();
 
-        // Retrieve the salted and hashed version of what the user enterec.
+        // Compare the entered password to the stored password for that user. 
         $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
+        // If the password does not match the record, display an error message. 
         if(!$row || !password_verify($password, $row['password'])){
             echo "Error: The entered data does not match the records. Try again.";
+
+        // If the login was successful, store a session variable to use in IF statements 
         } else {
             $_SESSION['username'] = $row['username'];
         }
 
+    // If the user has requested to log out
     } elseif (isset($_POST['logout'])){
+
+        // Unset all session variables and end the session.
         $_SESSION = array();
         session_destroy();
+
+        // Redirect the user back to the login page upon log out
         header("Location: login.php");
         exit();
     }

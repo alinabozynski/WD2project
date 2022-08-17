@@ -1,4 +1,6 @@
+<!-- Uses the GET superglobal to retrieve the record the user requests to view. --> 
 <?php    
+    // Require the connection to the database for this page
     require('connect.php');
 
     // Build SQL String and prepare PDO::Statement from the query.
@@ -9,7 +11,10 @@
     // Execute() on the DB server.
     $statement->execute(); 
 
+    // If the user has created a new user from the admin page 
     if(isset($_POST['new_user'])){
+
+        // Check if passwords match
         function filterinput(){
             $errors = false;
 
@@ -23,30 +28,36 @@
             return $errors;
         }
 
+        // If the passwords do not match, display the error.
         if(filterinput() == true){
             echo "Password fields must match.";
         } else {
-            try {
 
-                // Try inserting user data to MySQL.
+            // Try to create a login account with the user's entered values.
+            try {
                 $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $og_password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
+                // Salt and hash the entered password to insert into the database.
                 $options = [
                     'salt' => "78302huirlys8t9420hjgif",
                 ];
 
                 $password = password_hash($og_password, PASSWORD_BCRYPT, $options);
 
+                // Build and prepare the parameterized SQL query and bind to the above sanitized values.
                 $query = "INSERT INTO logins (username, password) VALUES (:username, :password)";        
                 $statement = $db->prepare($query); 
                 $statement->bindValue(':username', $username);
                 $statement->bindValue('password', $password);
 
+                // Execute the INSERT
                 $statement->execute();
 
+                // Redirect after INSERT
                 header("Location: login_data.php");
 
+            // If the username already exists, display an error message.
             } catch (PDOException $e) {
                 print "Error: '" . $_POST['username'] . "' already exists. Please choose a different username.";
                 
@@ -71,8 +82,8 @@
         <h1><a href="index.php">VROAR Inc.</a> - <a href="login.php">Administration Home Page</a></h1>
     </header>
 
-    <h3>Create a new user</h3>
     <form method="POST" action="login_data.php"> 
+        <h3>Create a new user</h3>
         <label for="username">Username: </label>
         <input type="text" id="username" name="username">
         <label for="password1">Password: </label>
