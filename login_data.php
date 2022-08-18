@@ -1,4 +1,4 @@
-<!-- Uses the GET superglobal to retrieve the record the user requests to view. --> 
+<!-- Creates a new login account and displayed the current account records. --> 
 <?php    
     // Require the connection to the database for this page
     require('connect.php');

@@ -93,7 +93,7 @@
         // UPDATE the current comment value to the disemvoweled version 
         $new_query = "UPDATE dept_comments SET comment = :disemvoweled WHERE comm_id = :comm_id LIMIT 1";
         $new_statement = $db->prepare($new_query);
-        $new_statement->bindValue(':comment', $disemvoweled);
+        $new_statement->bindValue(':disemvoweled', $disemvoweled);
         $new_statement->bindValue(':comm_id', $comm_id);
         $new_statement->execute();
 
@@ -269,9 +269,9 @@
     </head>
     <body>
         <section>
-            <h1><a href="index.php">VROAR Inc.</a></h1>
-            <h1>- <?= $department['department_name'] ?></h1>
+            <h1><a href="index.php">VROAR Inc.</a> - <?= $department['department_name'] ?></h1>
             <h3><a href="index.php">Home</a></h3>
+            <h3><a href="login.php">📝</a></h3>
         </section>
         <div>
             <p><b>Department Name: </b><?= $department['department_name'] ?></p>

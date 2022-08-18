@@ -100,7 +100,7 @@
 
         $statement = $db->prepare($query);
 
-        $statement->bindValue('department_id', $department_id);
+        $statement->bindValue('department_id', $department_id, PDO::PARAM_INT);
 
         // Execute the SELECT and fetch the single row returned.
         $statement->execute();
@@ -110,7 +110,6 @@
         if($_POST){
             echo "Update failed.";
         }
-
     }
 ?>
 <!DOCTYPE html>
@@ -140,8 +139,9 @@
     <?php if(!isset($_GET['emp_id']) && !isset($_GET['department_id'])): ?>
         <p>No record selected.</p>
     <?php else: ?>
+        <form method="post" action="edit.php?<?php echo isset($_GET['emp_id']) ? "emp_id=".$_GET['emp_id'] : "department_id=".$_GET['department_id'] ?>">
+            
         <?php if(isset($_GET['emp_id'])): ?>
-            <form method="post" action="edit.php?<?php echo isset($_GET['emp_id']) ? "emp_id=".$_GET['emp_id'] : "department_id=".$_GET['department_id'] ?>">
                 <label for="first_name">First Name: </label>
                 <input id="first_name" name="first_name" value="<?= $employee['first_name'] ?>">
                 <label for="last_name">Last Name: </label>
@@ -159,6 +159,7 @@
                 </select>
                 <input type="submit" class="submit" value="Update Record">
             </form>
+
                 <?php if($employee['image_file'] != null): ?>
                     <p><img src="uploads/<?= $employee['image_file'] ?>" alt="<?= $employee['image_file'] ?>" title="<?= $employee['image_file'] ?>" height="300"></p>
                     <p><a href="image_removal.php?emp_id=<?= $employee['emp_id'] ?>">Remove image from this record</a></p>
@@ -180,8 +181,8 @@
                             <input type="submit" class="submit" name="disemvowel_comment" value="Disemvowel Comment">
                         </form>
                     </div>
-            <?php endif ?>
-        <?php endwhile ?>
+                <?php endif ?>
+            <?php endwhile ?>
 
         <?php elseif(isset($_GET['department_id'])): ?>
                 <label for="department_name">Department Name: </label>
@@ -192,10 +193,12 @@
                 <input id="email" name="email" value="<?= $department['email'] ?>" size=35>
                 <input type="submit" class="submit" value="Update Record">
             </form>
+
                 <?php if($department['image_file'] != null): ?>
                     <p><img src="uploads/<?= $department['image_file'] ?>" alt="<?= $department['image_file'] ?>" title="<?= $department['image_file'] ?>" height="300"></p>
                     <p><a href="image_removal.php?department_id=<?= $department['department_id'] ?>">Remove image from this record</a></p>
                 <?php endif ?>
+
             <form method="post" action="delete.php?department_id=<?= $_GET['department_id'] ?>">
                 <input type="submit" class="submit" value="Delete Record">
             </form>

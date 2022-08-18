@@ -44,7 +44,7 @@
         // Fetch the row of the selected record
         $initial_query = "SELECT * FROM departments WHERE department_id = :department_id LIMIT 1";
         $initial_statement = $db->prepare($initial_query);
-        $initial_statement->bindValue(':emp_id', $emp_id, PDO::PARAM_INT);
+        $initial_statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
         $initial_statement->execute();
         $temp_department = $initial_statement->fetch();
 

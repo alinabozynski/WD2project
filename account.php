@@ -26,23 +26,6 @@
         if(filterinput() == true){
             echo "Password fields must match.";
 
-            // Ensure username is still displayed in the form
-            $username = filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING);
-
-            // Build the parametrized SQL query using the filtered value.
-            $query = "SELECT * FROM logins WHERE username = :username LIMIT 1";
-
-            $statement = $db->prepare($query);
-
-            // Bind the :username parameter in the query to the sanitized username value.
-            $statement->bindValue(':username', $username);
-
-            // Execute the SELECT and fetch the returned row.
-            $statement->execute();
-
-            // Only grabbing one row, so the fetch is here instead of in the HTML
-            $login = $statement->fetch();
-
         // If both password fields match
         } else {
 
@@ -58,7 +41,7 @@
                 $id = $login['id'];
 
                 // Try inserting user data to MySQL
-                $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+                $new_username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
                 $og_password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
                 // Salt and hash the entered password
@@ -69,9 +52,9 @@
                 $password = password_hash($og_password, PASSWORD_BCRYPT, $options);
 
                 // Perform the update
-                $query = "UPDATE logins SET username = :username, password = :password WHERE id = :id LIMIT 1";
+                $query = "UPDATE logins SET username = :new_username, password = :password WHERE id = :id LIMIT 1";
                 $statement = $db->prepare($query); 
-                $statement->bindValue(':username', $username);
+                $statement->bindValue(':new_username', $new_username);
                 $statement->bindValue(':password', $password);
                 $statement->bindValue(':id', $id, PDO::PARAM_INT);
                 $statement->execute();
@@ -82,23 +65,6 @@
             // If the query does not execute, the username already exists. So, display the error.
             } catch (PDOException $e) {
                 print "Error: '" . $_POST['username'] . "' already exists. Please choose a different username.";
-
-                // Ensure username is still displayed in the form
-                $username = filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING);
-
-                // Build the parametrized SQL query using the filtered value.
-                $query = "SELECT * FROM logins WHERE username = :username LIMIT 1";
-
-                $statement = $db->prepare($query);
-
-                // Bind the :username parameter in the query to the sanitized username value.
-                $statement->bindValue(':username', $username);
-
-                // Execute the SELECT and fetch the single row returned.
-                $statement->execute();
-
-                // Grab the row
-                $login = $statement->fetch();
             }
         }
 
@@ -146,7 +112,7 @@
     <?php else: ?>
         <form method="post" action="account.php?username=<?= $_GET['username'] ?>">
             <label for="username">Username: </label>
-            <input id="username" name="username" value="<?= $login['username'] ?>">
+            <input id="username" name="username" value="<?= $_GET['username'] ?>">
             <label for="password1">New Password: </label>
             <input type="password" id="password1" name="password1">
             <label for="password2">Re-enter Password: </label>

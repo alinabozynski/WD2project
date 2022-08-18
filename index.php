@@ -5,12 +5,94 @@
     // Require the connection to the database for this page
     require('connect.php');
 
+    // Grab the department info to display the departments list in the search bar category option
+    $initial_query = "SELECT * FROM departments";
+    $initial_statement = $db->prepare($initial_query);
+    $initial_statement->execute(); 
+
     // If the user has entered a keyword to search the database for 
     if(isset($_POST['search_request'])){
-        $keyword =
+        if(str_contains(trim($_POST['search']), ' ')){
+            $search_results = false;
+
+            echo "Sorry, the keyword search bar only accepts one word searches.";
+
+            // Build SQL String and prepare PDO::Statement from the query.
+            $query = "SELECT * FROM employees ORDER BY last_name";
+            $query2 = "SELECT * FROM departments ORDER BY department_name";
+
+            $statement = $db->prepare($query);
+            $statement2 = $db->prepare($query2);
+
+            // Execute() on the DB server.
+            $statement->execute(); 
+            $statement2->execute();
+
+        } else {
+                // Retrieve user submitted keyword from the search form 
+                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
+                $query = "SELECT * FROM employees WHERE first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
+                $statement = $db->prepare($query);
+                $statement->execute();
+
+                $query2 = "SELECT * FROM departments WHERE department_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
+                $statement2 = $db->prepare($query2);
+                $statement2->execute();
+
+                // Check if the query had results 
+                $results1 = [];
+                while($employee = $statement->fetch()){
+                    $results1 = $employee['emp_id'];
+                }
+
+                // Check if the query had results 
+                $results2 = [];
+                while($department = $statement2->fetch()){
+                    $results2 = $department['department_id'];
+                }
+
+                if(empty($results1) && !empty($results2)){
+                    echo "No employee records found for your search.";
+                } else {
+
+                    $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
+                    $query = "SELECT * FROM employees WHERE first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
+                    $statement = $db->prepare($query);
+                    $statement->execute();
+                }
+
+                if(empty($results2) && !empty($results1)){
+                    echo "No department records found for your search.";
+                } else {
+
+                    $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
+                    $query2 = "SELECT * FROM departments WHERE department_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";;
+                    $statement2 = $db->prepare($query2);
+                    $statement2->execute();
+                }
+
+                if(empty($results1) && empty($results2)){
+                    echo "No records match your search."; 
+                    $search_results = false;
+
+                    // Build SQL String and prepare PDO::Statement from the query.
+                    $query = "SELECT * FROM employees ORDER BY last_name";
+                    $query2 = "SELECT * FROM departments ORDER BY department_name";
+
+                    $statement = $db->prepare($query);
+                    $statement2 = $db->prepare($query2);
+
+                    // Execute() on the DB server.
+                    $statement->execute(); 
+                    $statement2->execute();
+
+                }
+
+        }
 
     // If no keyword has been searched for, set and use a default ORDER BY value
     } else {
+
         // Build SQL String and prepare PDO::Statement from the query.
         $query = "SELECT * FROM employees ORDER BY last_name";
         $query2 = "SELECT * FROM departments ORDER BY department_name";
@@ -50,31 +132,35 @@
     <form method="POST" action="index.php">
         <label for="search">Search by keyword</label>
         <input type="text" id="search" name="search">
+        <select name="category" id="category">
+            <option value="no_category">OPTIONAL: Select a category to search in</option>
+            <?php while($row = $initial_statement->fetch()): ?>
+                <option><?= $row['department_name'] ?></option>
+            <?php endwhile ?>
+        </select>
         <input type="submit" class="submit" name="search_request" value="Search">
     </form>
 
-    <?php if(isset($_POST['search_request'])): ?>
-        <?php if(): ?>
-        <?php else: ?>
-        <?php endif ?>
-    <?php else: ?>
-        <section>
+    <section>
+        <?php if(!empty($results1)): ?>
             <h3>Seach for contact information by Employee name:</h3>
-            <ul>
-                <?php while($row = $statement->fetch()): ?>
-                    <li><a href="details.php?emp_id=<?= $row['emp_id'] ?>"><?= $row['last_name'] ?>, <?= $row['first_name'] ?></a></li>
-                <?php endwhile ?>
-            </ul>
-        </section>
+        <?php endif ?>
+        <ul>
+            <?php while($row = $statement->fetch()): ?>
+                <li><a href="details.php?emp_id=<?= $row['emp_id'] ?>"><?= $row['last_name'] ?>, <?= $row['first_name'] ?></a></li>
+            <?php endwhile ?>
+        </ul>
+    </section>
 
-        <section>
-            <h3>Seach for contact information by category with Department names:</h3>
-            <ul>
-                <?php while($row = $statement2->fetch()): ?>
-                    <li><a href="details.php?department_id=<?= $row['department_id'] ?>"><?= $row['department_name'] ?></a></li>
-                <?php endwhile ?>
-            </ul>
-        </section>
-    <?php endif ?>
+    <section>
+        <?php if(!empty($results2)): ?>
+            <h3>Seach for contact information by category with a department name:</h3>
+        <?php endif ?>
+        <ul>
+            <?php while($row = $statement2->fetch()): ?>
+                <li><a href="details.php?department_id=<?= $row['department_id'] ?>"><?= $row['department_name'] ?></a></li>
+            <?php endwhile ?>
+        </ul>
+    </section>
 </body>
 </html> 
