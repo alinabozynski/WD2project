@@ -28,6 +28,7 @@
 
         // If both password fields match
         } else {
+            ini_set('display_errors', false);
 
             // Try to update the account with the user's entered values.
             try {
@@ -104,7 +105,7 @@
     <header>
         <h1><a href="index.php">VROAR Inc.</a></h1>
         <h1 id="middle">Edit <?= $_GET['username'] ?>'s Account</h1>
-        <h1><a href="login.php">📝</a></h1>
+        <h1><a href="login.php" title="Admin Access">📝</a></h1>
     </header>
 
     <?php if(!isset($_GET['username'])): ?>

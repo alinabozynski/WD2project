@@ -130,7 +130,7 @@
     <header>
         <h1><a href="index.php">VROAR Inc.</a></h1> 
         <h1 id="middle">Image Upload for <?php echo isset($_GET['emp_id']) ? $employee['first_name']." ".$employee['last_name']  : $department['department_name'] ?></h1>
-        <h1><a href="login.php">📝</a></h1>
+        <h1><a href="login.php" title="Admin Access">📝</a></h1>
     </header>
 
     <form method='post' enctype='multipart/form-data'>

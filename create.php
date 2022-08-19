@@ -136,7 +136,7 @@
     <header>
         <h1><a href="index.php">VROAR Inc.</a></h1>
         <h1 id="middle"><a href="create.php?type=<?= $_GET['type'] ?>">New <?= ucfirst($_GET['type']) ?> Entry</a></h1>
-        <h1><a href="login.php">📝</a></h1>
+        <h1><a href="login.php" title="Admin Access">📝</a></h1>
     </header>
 
     <?php if($_GET['type'] == "employee"): ?>

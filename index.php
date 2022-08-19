@@ -32,6 +32,7 @@
         if(filterinput() == true){
             echo "Password fields must match.";
         } else {
+            ini_set('display_errors', false);
 
             // Try to create a login account with the user's entered values.
             try {
@@ -60,11 +61,6 @@
             // If the username already exists, display an error message.
             } catch (PDOException $e) {
                 print "Error: '" . $_POST['username'] . "' already exists. Please choose a different username.";
-                
-                // Ensure the page still displays everything it displayed before the error.
-                $query = "SELECT * FROM logins ORDER BY username";
-                $statement = $db->prepare($query);
-                $statement->execute(); 
             }
         }
     }
@@ -91,55 +87,29 @@
         } else {
             $any_search_results = true;
 
-            if(!isset($_POST['category'])){
-                // Retrieve user submitted keyword from the search form 
-                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
-                $query = "SELECT * FROM employees WHERE first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
-                $statement = $db->prepare($query);
-                $statement->execute();
+            // Retrieve user submitted keyword from the search form 
+            $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
 
-                $query2 = "SELECT * FROM departments WHERE department_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
-                $statement2 = $db->prepare($query2);
-                $statement2->execute(); 
+            $query = "SELECT * FROM employees WHERE first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
+            $statement = $db->prepare($query);
+            $statement->execute();
 
-            } else {
-                // Grab the user selected category (department name)
-                // No sanitization necessary for a select option value
-                $department_name = $_POST['category'];
+            $query2 = "SELECT * FROM departments WHERE department_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
+            $statement2 = $db->prepare($query2);
+            $statement2->execute(); 
 
-                $dept_query = "SELECT * FROM departments WHERE department_name = :department_name LIMIT 1";
-                $dept_statement = $db->prepare($dept_query);
-                $dept_statement->bindValue(':department_name', $department_name, PDO::PARAM_STR);
-                $dept_statement->execute();
-                $dept = $dept_statement->fetch();
-                $department_id = $dept['department_id'];
-
-                // Retrieve user submitted keyword from the search form 
-                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
-                $query = "SELECT * FROM employees WHERE department_id = :department_id AND first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
-                $statement = $db->prepare($query);
-                $statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
-                $statement->execute();
-
-                $query2 = "SELECT * FROM departments WHERE department_id = :department_id AND department_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
-                $statement2 = $db->prepare($query2);
-                $statement2->bindValue(':department_id', $department_id, PDO::PARAM_INT);
-                $statement2->execute();
-            }
-
-            // Check if the query had results 
+            // Check if the queries had results 
             $results1 = [];
             while($employee = $statement->fetch()){
                 $results1 = $employee['emp_id'];
             }
 
-            // Check if the query had results 
             $results2 = [];
             while($department = $statement2->fetch()){
                 $results2 = $department['department_id'];
             }
 
-            // Display error meessages and ensure data is still displayed on the page. 
+            // Display error meessages and ensure data is displayed on the page. 
             if(empty($results1) && !empty($results2)){
                 echo "No employee records found for your search.";
 
@@ -207,7 +177,7 @@
     <form method="POST" action="index.php">
         <h3>Wish to create an account? Fill out the form below :)</h3>
         <label for="username">Username: </label>
-        <input type="text" id="username" name="username">
+        <input type="text" id="username" name="username" value="<?php echo isset($_POST['username']) ? $_POST['username'] : ''; ?>">
         <label for="password1">Password: </label>
         <input type="password" id="password1" name="password1">
         <label for="password2">Re-enter Password: </label>
@@ -216,14 +186,8 @@
     </form>
 
     <form method="POST" action="index.php">
-        <label for="search">Search by keyword (employees within a department): </label>
+        <label for="search">Search by keyword</label>
         <input type="text" id="search" name="search" autofocus>
-        <select name="category" id="category">
-            <option value="">OPTIONAL: Select a category to search in</option>
-            <?php while($row = $initial_statement->fetch()): ?>
-                <option><?= $row['department_name'] ?></option>
-            <?php endwhile ?>
-        </select>
         <input type="submit" class="submit" name="search_request" value="Search">
     </form>
 

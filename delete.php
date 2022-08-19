@@ -89,7 +89,7 @@
     <header>
         <h1><a href="index.php">VROAR Inc.</a></h1>
         <h1 id="middle"><?php if(isset($_GET['account'])){ echo "Account";} else {echo isset($_GET['emp_id']) ? "Employee Record" : "Department Record";} ?> Deleted</h1>
-        <h1><a href="login.php">📝</a></h1>
+        <h1><a href="login.php" title="Admin Access">📝</a></h1>
     </header>
     <div>
         <p>The selected record has been deleted successfully.</p>

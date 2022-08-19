@@ -123,7 +123,7 @@
     <header>
         <h1><a href="index.php">VROAR Inc.</a></h1>
         <h1 id="middle">Edit <i><?php echo isset($_GET['emp_id']) ? $employee['first_name'] . ' ' . $employee['last_name'] . "'s" : $department['department_name'] ?></i> Record</h1>
-        <h1><a href="login.php">📝</a></h1>
+        <h1><a href="login.php" title="Admin Access">📝</a></h1>
     </header>
 
     <div>

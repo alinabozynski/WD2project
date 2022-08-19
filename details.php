@@ -246,7 +246,7 @@
         <header>
             <h1><a href="index.php">VROAR Inc.</a></h1>
             <h1 id="middle"><?= $employee['first_name'] ?> <?= $employee['last_name'] ?></h1>
-            <h1><a href="login.php">📝</a></h1>
+            <h1><a href="login.php" title="Admin Access">📝</a></h1>
         </header>
 
         <h3>Employee Information</h3>
@@ -294,7 +294,7 @@
         <header>
             <h1><a href="index.php">VROAR Inc.</a></h1>
             <h1 id="middle"><?= $department['department_name'] ?></h1>
-            <h1><a href="login.php">📝</a></h1>
+            <h1><a href="login.php" title="Admin Access">📝</a></h1>
         </header>
 
         <h3>Department Information</h3>

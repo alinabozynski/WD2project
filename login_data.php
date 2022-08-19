@@ -32,6 +32,7 @@
         if(filterinput() == true){
             echo "Password fields must match.";
         } else {
+            ini_set('display_errors', false);
 
             // Try to create a login account with the user's entered values.
             try {
@@ -81,13 +82,13 @@
     <header>
         <h1><a href="index.php">VROAR Inc.</a></h1>
         <h1 id="middle">Login Data</h1> 
-        <h1><a href="login.php">📝</a></h1>
+        <h1><a href="login.php" title="Admin Access">📝</a></h1>
     </header>
 
     <form method="POST" action="login_data.php"> 
         <h3>Create a new user</h3>
         <label for="username">Username: </label>
-        <input type="text" id="username" name="username">
+        <input type="text" id="username" name="username" value="<?php echo isset($_POST['username']) ? $_POST['username'] : ''; ?>">
         <label for="password1">Password: </label>
         <input type="password" id="password1" name="password1">
         <label for="password2">Re-enter Password: </label>
