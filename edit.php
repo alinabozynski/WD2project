@@ -27,9 +27,9 @@
     if($_POST && isset($_GET['emp_id']) && !empty($_POST['first_name']) && !empty($_POST['last_name']) && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email']) && $_POST['department_id'] != "Select a Department ID"){
         // Sanitize user input to escape HTML entities and filter out dangerous characters.
         $emp_id = filter_input(INPUT_GET, 'emp_id', FILTER_SANITIZE_NUMBER_INT);
-        $first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $last_name = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $tel_number = filter_input(INPUT_POST, 'tel_number', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING);
+        $last_name = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_STRING);
+        $tel_number = filter_input(INPUT_POST, 'tel_number', FILTER_SANITIZE_STRING);
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $department_id = filter_input(INPUT_POST, 'department_id', FILTER_VALIDATE_INT);
 
@@ -39,7 +39,7 @@
         $statement->bindValue(':first_name', $first_name, PDO::PARAM_STR);        
         $statement->bindValue(':last_name', $last_name, PDO::PARAM_STR);
         $statement->bindValue(':tel_number', $tel_number, PDO::PARAM_STR);
-        $statement->bindValue(':email', $email. PDO::PARAM_STR);
+        $statement->bindValue(':email', $email, PDO::PARAM_STR);
         $statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
         $statement->bindValue(':emp_id', $emp_id, PDO::PARAM_INT);
 
@@ -52,8 +52,8 @@
     } elseif($_POST && isset($_GET['department_id']) && !empty($_POST['department_name']) && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
         // Sanitize user input to escape HTML entities and filter out dangerous characters.
         $department_id = filter_input(INPUT_GET, 'department_id', FILTER_SANITIZE_NUMBER_INT);
-        $department_name = filter_input(INPUT_POST, 'department_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $tel_number = filter_input(INPUT_POST, 'tel_number', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $department_name = filter_input(INPUT_POST, 'department_name', FILTER_SANITIZE_STRING);
+        $tel_number = filter_input(INPUT_POST, 'tel_number', FILTER_SANITIZE_STRING);
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
         // Build and prepare the parameterized SQL query and bind to the above sanitized values.
@@ -153,9 +153,9 @@
                 <label for="last_name">Last Name: </label>
                 <input id="last_name" name="last_name" value="<?= $employee['last_name'] ?>" size=35>
                 <label for="tel_number">Phone Number: </label>
-                <input id="tel_number" name="tel_number" value="<?= $employee['tel_number'] ?>" size=35>
+                <input type="tel" id="tel_number" name="tel_number" value="<?= $employee['tel_number'] ?>" size=35>
                 <label for="email">Email: </label>
-                <input id="email" name="email" value="<?= $employee['email'] ?>" size=35>
+                <input type="email" id="email" name="email" value="<?= $employee['email'] ?>" size=35>
                 <label for="department_id">Department ID: </label>
                 <select id="department_id" name="department_id">
                     <option>Select a Department ID</option>
@@ -200,9 +200,9 @@
                 <label for="department_name">Department Name: </label>
                 <input id="department_name" name="department_name" value="<?= $department['department_name'] ?>" size=35>
                 <label for="tel_number">Phone Number: </label>
-                <input id="tel_number" name="tel_number" value="<?= $department['tel_number'] ?>" size=35>
+                <input type="tel" id="tel_number" name="tel_number" value="<?= $department['tel_number'] ?>" size=35>
                 <label for="email">Email: </label>
-                <input id="email" name="email" value="<?= $department['email'] ?>" size=35>
+                <input type="email" id="email" name="email" value="<?= $department['email'] ?>" size=35>
                 <input type="submit" class="submit" value="Update Record">
             </form>
 

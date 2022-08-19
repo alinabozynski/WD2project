@@ -10,7 +10,7 @@
         require('connect.php');
 
         // Retrieve the row in MySQL with the entered username.
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
         $query = "SELECT * FROM logins WHERE username = :username LIMIT 1";     
         $statement = $db->prepare($query); 
         $statement->bindValue(':username', $username, PDO::PARAM_STR);
@@ -18,7 +18,7 @@
         $row = $statement->fetch();
 
         // Compare the entered password to the stored password for that user. 
-        $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
 
         // If the password does not match the record, display an error message. 
         if(!$row || !password_verify($password, $row['password'])){

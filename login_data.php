@@ -18,8 +18,8 @@
         function filterinput(){
             $errors = false;
 
-            $password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $pass2 = filter_input(INPUT_POST, 'password2', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_STRING);
+            $pass2 = filter_input(INPUT_POST, 'password2', FILTER_SANITIZE_STRING);
 
             if($password != $pass2){
                 $errors = true;
@@ -35,8 +35,8 @@
 
             // Try to create a login account with the user's entered values.
             try {
-                $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-                $og_password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+                $og_password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_STRING);
 
                 // Salt and hash the entered password to insert into the database.
                 $options = [

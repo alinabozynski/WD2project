@@ -18,8 +18,8 @@
         function filterinput(){
             $errors = false;
 
-            $password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $pass2 = filter_input(INPUT_POST, 'password2', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_STRING);
+            $pass2 = filter_input(INPUT_POST, 'password2', FILTER_SANITIZE_STRING);
 
             if($password != $pass2){
                 $errors = true;
@@ -35,8 +35,8 @@
 
             // Try to create a login account with the user's entered values.
             try {
-                $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-                $og_password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+                $og_password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_STRING);
 
                 // Salt and hash the entered password to insert into the database.
                 $options = [
@@ -72,10 +72,10 @@
     // If the user has entered a keyword to search the database for 
     if(isset($_POST['search_request'])){
 
-        if(str_contains(trim($_POST['search']), ' ') || empty($_POST['search'])){
+        if(empty($_POST['search'])){
             $any_search_results = false;
 
-            echo "Could not search. Ensure the search bar is not blank. *Also note that the search only accepts <i>single word</i> submissions.";
+            echo "Could not search. Ensure the search bar is not empty.";
 
             // Build SQL String and prepare PDO::Statement from the query.
             $query = "SELECT * FROM employees ORDER BY last_name";
@@ -93,7 +93,7 @@
 
             if($_POST['category'] == "no_category"){
                 // Retrieve user submitted keyword from the search form 
-                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_SPECIAL_CHARS);
+                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
                 $query = "SELECT * FROM employees WHERE first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
                 $statement = $db->prepare($query);
                 $statement->execute();
@@ -115,7 +115,7 @@
                 $department_id = $dept['department_id'];
 
                 // Retrieve user submitted keyword from the search form 
-                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_SPECIAL_CHARS);
+                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
                 $query = "SELECT * FROM employees WHERE department_id = :department_id AND first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
                 $statement = $db->prepare($query);
                 $statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
@@ -142,14 +142,14 @@
             if(empty($results1) && !empty($results2)){
                 echo "No employee records found for your search.";
 
-                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_SPECIAL_CHARS);
+                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
                 $query2 = "SELECT * FROM departments WHERE department_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";;
                 $statement2 = $db->prepare($query2);
                 $statement2->execute();
             } elseif(!empty($results1) && empty($results2)) {
                 echo "No department records found for your search.";
 
-                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_SPECIAL_CHARS);
+                $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
                 $query = "SELECT * FROM employees WHERE first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
                 $statement = $db->prepare($query);
                 $statement->execute();
@@ -215,7 +215,7 @@
     </form>
 
     <form method="POST" action="index.php">
-        <label for="search">Search by keyword</label>
+        <label for="search">Search by keyword (employees within a department): </label>
         <input type="text" id="search" name="search" autofocus>
         <select name="category" id="category">
             <option value="no_category">OPTIONAL: Select a category to search in</option>

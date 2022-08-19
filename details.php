@@ -4,8 +4,8 @@
     require('connect.php');
 
     // Retrieve both comments table data to display any matches for the selected record
-    $emp_commments_query = "SELECT * from emp_comments";
-    $dept_comments_query = "SELECT * from dept_comments";
+    $emp_commments_query = "SELECT * from emp_comments ORDER BY created DESC";
+    $dept_comments_query = "SELECT * from dept_comments ORDER BY created DESC";
     $emp_comment_statement = $db->prepare($emp_commments_query);
     $dept_comment_statement = $db->prepare($dept_comments_query);
     $emp_comment_statement->execute();
