@@ -91,7 +91,7 @@
         } else {
             $any_search_results = true;
 
-            if($_POST['category'] == "no_category"){
+            if(!isset($_POST['category'])){
                 // Retrieve user submitted keyword from the search form 
                 $keyword = filter_input(INPUT_POST, 'search', FILTER_SANITIZE_STRING);
                 $query = "SELECT * FROM employees WHERE first_name LIKE '%$keyword%' OR last_name LIKE '%$keyword%' OR tel_number LIKE '%$keyword%' OR email LIKE '%$keyword%' OR image_file LIKE '%$keyword%'";
@@ -139,6 +139,7 @@
                 $results2 = $department['department_id'];
             }
 
+            // Display error meessages and ensure data is still displayed on the page. 
             if(empty($results1) && !empty($results2)){
                 echo "No employee records found for your search.";
 
@@ -218,7 +219,7 @@
         <label for="search">Search by keyword (employees within a department): </label>
         <input type="text" id="search" name="search" autofocus>
         <select name="category" id="category">
-            <option value="no_category">OPTIONAL: Select a category to search in</option>
+            <option value="">OPTIONAL: Select a category to search in</option>
             <?php while($row = $initial_statement->fetch()): ?>
                 <option><?= $row['department_name'] ?></option>
             <?php endwhile ?>

@@ -127,11 +127,19 @@
             $emp_id = filter_input(INPUT_GET, 'emp_id', FILTER_SANITIZE_NUMBER_INT);
             $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_STRING);
 
+            // Retrieve or set default value for user's name 
+            if(empty($_POST['user']) || !isset($_POST['user'])) {
+                $user = "anonymous";
+            }elseif(!empty($_POST['user']) || isset($_POST['user'])){
+                $user = filter_input(INPUT_POST, 'user', FILTER_SANITIZE_STRING);
+            } 
+
             // Build and prepare the parameterized SQL query and bind to the above sanitized values.
-            $query = "INSERT INTO emp_comments (emp_id, comment) VALUES (:emp_id, :comment)";
+            $query = "INSERT INTO emp_comments (emp_id, comment, user) VALUES (:emp_id, :comment, :user)";
             $statement = $db->prepare($query); 
             $statement->bindValue(':emp_id', $emp_id, PDO::PARAM_INT);
             $statement->bindValue(':comment', $comment, PDO::PARAM_STR);
+            $statement->bindValue(':user', $user, PDO::PARAM_STR);
 
             // Execute the INSERT statement.
             $statement->execute(); 
@@ -146,11 +154,19 @@
             $department_id = filter_input(INPUT_GET, 'department_id', FILTER_SANITIZE_NUMBER_INT);
             $comment = filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_STRING);
 
+            // Retrieve or set default value for user's name 
+            if(empty($_POST['user']) || !isset($_POST['user'])) {
+                $user = "anonymous";
+            } elseif(!empty($_POST['user']) || isset($_POST['user'])){
+                $user = filter_input(INPUT_POST, 'user', FILTER_SANITIZE_STRING);
+            } 
+
             // Build and prepare the parameterized SQL query and bind to the above sanitized values.
-            $query = "INSERT INTO dept_comments (department_id, comment) VALUES (:department_id, :comment)";
+            $query = "INSERT INTO dept_comments (department_id, comment, user) VALUES (:department_id, :comment, :user)";
             $statement = $db->prepare($query); 
             $statement->bindValue(':department_id', ucfirst($department_id),PDO::PARAM_INT);
             $statement->bindValue(':comment', $comment, PDO::PARAM_STR);
+            $statement->bindValue(':user', $user, PDO::PARAM_STR);
 
             // Execute the INSERT statement.
             $statement->execute(); 
@@ -250,6 +266,8 @@
 
         <form method="POST" action="details.php?emp_id=<?= $_GET['emp_id'] ?>">
             <h3>Add a comment about this employee</h3>
+            <label for="user">Your name (optional):</label>
+            <input type="text" id="user" name="user" size=35>
             <textarea rows=3 cols=110 id="comment" name="comment" value="<?php echo isset($_POST['comment']) ? $_POST['comment'] : ''; ?>"></textarea>
             <input type="submit" class="submit" name="add_comment" value="Add Comment">
         </form>
@@ -257,6 +275,7 @@
         <?php while($comments = $emp_comment_statement->fetch()): ?>
             <?php if($comments['emp_id'] == $_GET['emp_id']): ?>
                 <div class="comments">
+                    <p><b><?= $comments['user'] ?></b></p>
                     <p>Posted on: <?= $comments['created'] ?></p>
                     <p><?= $comments['comment'] ?></p>
                 </div>
@@ -302,6 +321,8 @@
 
         <form method="POST" action="details.php?department_id=<?= $_GET['department_id'] ?>">
             <h3>Add a comment about this department</h3>
+            <label for="user">Your name (optional):</label>
+            <input type="text" id="user" name="user" size=35>
             <textarea rows=3 cols=110 id="comment" name="comment" value="<?php echo isset($_POST['comment']) ? $_POST['comment'] : ''; ?>"></textarea>
             <input type="submit" class="submit" name="add_comment" value="Add Comment">
         </form>
@@ -309,6 +330,7 @@
         <?php while($comments = $dept_comment_statement->fetch()): ?>
             <?php if($comments['department_id'] == $_GET['department_id']): ?>
                 <div class="comments">
+                    <p><b><?= $comments['user'] ?></b></p>
                     <p>Posted on: <?= $comments['created'] ?></p>
                     <p><?= $comments['comment'] ?></p>
                 </div>

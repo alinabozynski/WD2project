@@ -15,8 +15,8 @@
     $initial_statement2->execute();
 
     // Retrieve both comments table data to display any matches for the selected record
-    $emp_commments_query = "SELECT * from emp_comments";
-    $dept_comments_query = "SELECT * from dept_comments";
+    $emp_commments_query = "SELECT * from emp_comments ORDER BY created DESC";
+    $dept_comments_query = "SELECT * from dept_comments ORDER BY created DESC";
     $emp_comment_statement = $db->prepare($emp_commments_query);
     $dept_comment_statement = $db->prepare($dept_comments_query);
     $emp_comment_statement->execute();
@@ -24,7 +24,7 @@
     
     // UPDATE record if user input is valid.
     // Used when user submits the form 
-    if($_POST && isset($_GET['emp_id']) && !empty($_POST['first_name']) && !empty($_POST['last_name']) && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email']) && $_POST['department_id'] != "Select a Department ID"){
+    if($_POST && isset($_GET['emp_id']) && !empty($_POST['first_name']) && !empty($_POST['last_name']) && preg_match('^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email']) && $_POST['department_id'] != "Select a Department ID"){
         // Sanitize user input to escape HTML entities and filter out dangerous characters.
         $emp_id = filter_input(INPUT_GET, 'emp_id', FILTER_SANITIZE_NUMBER_INT);
         $first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_STRING);
@@ -49,7 +49,7 @@
         // Redirect after update.
         header("Location: details.php?emp_id={$_GET['emp_id']}");
 
-    } elseif($_POST && isset($_GET['department_id']) && !empty($_POST['department_name']) && preg_match('^1(\s)?\(?204\)?(\s|.|-)?\d{3}(\s|.|-)?\d{4}$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
+    } elseif($_POST && isset($_GET['department_id']) && !empty($_POST['department_name']) && preg_match('^(?:\+?1[-.●]?)?\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$^', $_POST['tel_number']) && preg_match('/\A[a-zA-Z0-9+_.-]+@VROAR.com/', $_POST['email'])){
         // Sanitize user input to escape HTML entities and filter out dangerous characters.
         $department_id = filter_input(INPUT_GET, 'department_id', FILTER_SANITIZE_NUMBER_INT);
         $department_name = filter_input(INPUT_POST, 'department_name', FILTER_SANITIZE_STRING);
@@ -89,7 +89,7 @@
         $employee = $statement->fetch();
 
         if($_POST){
-            echo "Update failed. Please ensure all data is valid. No fields should be left as their defaults or blank, the phone number must be 11 digits long and starting with 1(204), and the email should be a valid email address ending in '@VROAR.com'.";
+            echo "Update failed. Please ensure all data is valid. No fields should be left as their defaults or blank, the phone number should be valid, and the email should be a valid email address ending in '@VROAR.com'.";
         }
     } elseif(isset($_GET['department_id'])){
         // Sanitize $_GET['department_id'].
@@ -108,7 +108,7 @@
         $department = $statement->fetch();
 
         if($_POST){
-            echo "Update failed. Please ensure all data is valid. No fields should be left as their defaults or blank, the phone number must be 11 digits long and starting with 1(204), and the email should be a valid email address ending in '@VROAR.com'.";
+            echo "Update failed. Please ensure all data is valid. No fields should be left as their defaults or blank, the phone number should be valid, and the email should be a valid email address ending in '@VROAR.com'.";
         }
     }
 ?>
@@ -180,6 +180,7 @@
             <?php while($comments = $emp_comment_statement->fetch()): ?>
                 <?php if($comments['emp_id'] == $_GET['emp_id']): ?>
                     <div class="comments">
+                        <p><?= $comments['user'] ?></p>
                         <p><?= $comments['created'] ?></p>
                         <p><?= $comments['comment'] ?></p>
                         <form method="POST" action="details.php?emp_id=<?= $_GET['emp_id'] ?>&comm_id=<?= $comments['comm_id'] ?>">
@@ -219,6 +220,7 @@
             <?php while($comments = $dept_comment_statement->fetch()): ?>
                 <?php if($comments['department_id'] == $_GET['department_id']): ?>
                     <div class="comments">
+                        <p><?= $comments['user'] ?></p>
                         <p><?= $comments['created'] ?></p>
                         <p><?= $comments['comment'] ?></p>
                         <form method="POST" action="details.php?department_id=<?= $_GET['department_id'] ?>&comm_id=<?= $comments['comm_id'] ?>">
