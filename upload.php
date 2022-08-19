@@ -11,7 +11,7 @@
         // Build and prepare the parameterized SQL query and bind to the above sanitized values.
         $initial_query = "SELECT * FROM employees WHERE emp_id = :emp_id LIMIT 1";
         $initial_statement = $db->prepare($initial_query);
-        $initial_statement->bindValue('emp_id', $emp_id);
+        $initial_statement->bindValue('emp_id', $emp_id, PDO::PARAM_INT);
 
         // Perform the SELECT
         $initial_statement->execute();
@@ -26,7 +26,7 @@
         // Build and prepare the parameterized SQL query and bind to the above sanitized values.
         $initial_query = "SELECT * FROM departments WHERE department_id = :department_id LIMIT 1";
         $initial_statement = $db->prepare($initial_query);
-        $initial_statement->bindValue('department_id', $department_id);
+        $initial_statement->bindValue('department_id', $department_id, PDO::PARAM_INT);
 
         // Perform the SELECT
         $initial_statement->execute();
@@ -85,7 +85,7 @@
                 // Build the parameterized SQL query and bind to the above sanitized values.
                 $query = "UPDATE employees SET image_file = :image_name WHERE emp_id = :emp_id LIMIT 1";
                 $statement = $db->prepare($query);
-                $statement->bindValue(':image_name', $image_name);
+                $statement->bindValue(':image_name', $image_name,PDO::PARAM_STR);
                 $statement->bindValue(':emp_id', $emp_id, PDO::PARAM_INT);
 
                 // Execute the UPDATE statement.
@@ -101,7 +101,7 @@
                 // Build the parameterized SQL query and bind to the above sanitized values.
                 $query = "UPDATE departments SET image_file = :image_name WHERE department_id = :department_id LIMIT 1";
                 $statement = $db->prepare($query);
-                $statement->bindValue(':image_name', $image_name);
+                $statement->bindValue(':image_name', $image_name, PDO::PARAM_STR);
                 $statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
 
                 // Execute the UPDATE statement.
@@ -118,19 +118,20 @@
         }
     }
 ?>
- <!DOCTYPE html>
- <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>Image Upload</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Shadows+Into+Light&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="home.css" />
+    <link rel="stylesheet" type="text/css" href="upload.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <section>
-        <h1><a href="index.php">VROAR Inc.</a> - Image Upload for <?php echo isset($_GET['emp_id']) ? $employee['first_name']." ".$employee['last_name']  : $department['department_name'] ?></h1>
-        <h3><a href="login.php">Administration Home Page</a></h3>
-    </section>
+    <header>
+        <h1><a href="index.php">VROAR Inc.</a></h1> 
+        <h1 id="middle">Image Upload for <?php echo isset($_GET['emp_id']) ? $employee['first_name']." ".$employee['last_name']  : $department['department_name'] ?></h1>
+        <h1><a href="login.php">📝</a></h1>
+    </header>
 
     <form method='post' enctype='multipart/form-data'>
         <label for='image'>Filename:</label>

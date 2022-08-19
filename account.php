@@ -35,7 +35,7 @@
                 $username = filter_input(INPUT_GET, 'username', FILTER_SANITIZE_STRING);
                 $query1 = "SELECT * FROM logins WHERE username = :username LIMIT 1";
                 $statement1 = $db->prepare($query1);
-                $statement1->bindValue(':username', $username);
+                $statement1->bindValue(':username', $username, PDO::PARAM_STR);
                 $statement1->execute();
                 $login = $statement1->fetch();
                 $id = $login['id'];
@@ -54,8 +54,8 @@
                 // Perform the update
                 $query = "UPDATE logins SET username = :new_username, password = :password WHERE id = :id LIMIT 1";
                 $statement = $db->prepare($query); 
-                $statement->bindValue(':new_username', $new_username);
-                $statement->bindValue(':password', $password);
+                $statement->bindValue(':new_username', $new_username, PDO::PARAM_STR);
+                $statement->bindValue(':password', $password, PDO::PARAM_STR);
                 $statement->bindValue(':id', $id, PDO::PARAM_INT);
                 $statement->execute();
 
@@ -98,32 +98,33 @@
 <head>
     <title><?= $_GET['username'] ?></title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="blog.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="account.css" />
 </head>
 <body>
-    <section>
-        <h1><a href="index.php">VROAR Inc.</a> - Edit <?= $_GET['username'] ?>'s Account</h1>
-        <h3><a href="login.php">Administration Home Page</a></h3>
-    </section>
+    <header>
+        <h1><a href="index.php">VROAR Inc.</a></h1>
+        <h1 id="middle">Edit <?= $_GET['username'] ?>'s Account</h1>
+        <h1><a href="login.php">📝</a></h1>
+    </header>
 
     <?php if(!isset($_GET['username'])): ?>
         <p>No account selected.</p>
     <?php else: ?>
-        <form method="post" action="account.php?username=<?= $_GET['username'] ?>">
-            <label for="username">Username: </label>
-            <input id="username" name="username" value="<?= $_GET['username'] ?>">
-            <label for="password1">New Password: </label>
-            <input type="password" id="password1" name="password1">
-            <label for="password2">Re-enter Password: </label>
-            <input type="password" id="password2" name="password2">
-            <input type="submit" class="submit" value="Update Account">
-        </form>
+        <div>
+            <form method="post" action="account.php?username=<?= $_GET['username'] ?>">
+                <label for="username">Username: </label>
+                <input id="username" name="username" value="<?= $_GET['username'] ?>">
+                <label for="password1">New Password: </label>
+                <input type="password" id="password1" name="password1" autofocus>
+                <label for="password2">Re-enter Password: </label>
+                <input type="password" id="password2" name="password2">
+                <input type="submit" class="submit" value="Update Account">
+            </form>
 
-        <form method="post" action="delete.php?username=<?= $_GET['username'] ?>">
-            <input type="submit" class="submit" value="Delete Record">
-        </form>
-    
+            <form method="post" action="delete.php?username=<?= $_GET['username'] ?>">
+                <input type="submit" class="submit" value="DELETE Record">
+            </form>
+        </div>
     <?php endif ?>
 </body>
 </html> 

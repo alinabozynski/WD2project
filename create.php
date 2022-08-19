@@ -89,11 +89,11 @@
                 // Build and prepare the parameterized SQL query and bind to the above sanitized values.
                 $query = "INSERT INTO employees (first_name, last_name, tel_number, email, department_id) VALUES (:first_name, :last_name, :tel_number, :email, :department_id)";
                 $statement = $db->prepare($query); 
-                $statement->bindValue(':first_name', ucfirst($first_name));
-                $statement->bindValue(':last_name', ucfirst($last_name));
-                $statement->bindValue(':tel_number', $tel_number);
-                $statement->bindValue(':email', $email);
-                $statement->bindValue(':department_id', $department_id);
+                $statement->bindValue(':first_name', ucfirst($first_name), PDO::PARAM_STR);
+                $statement->bindValue(':last_name', ucfirst($last_name), PDO::PARAM_STR);
+                $statement->bindValue(':tel_number', $tel_number,PDO::PARAM_STR);
+                $statement->bindValue(':email', $email, PDO::PARAM_STR);
+                $statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
 
                 // Execute the INSERT statement.
                 $statement->execute(); 
@@ -111,9 +111,9 @@
                 // Build and prepare the parameterized SQL query and bind to the above sanitized values.
                 $query = "INSERT INTO departments (department_name, tel_number, email) VALUES (:department_name, :tel_number, :email)";
                 $statement = $db->prepare($query); 
-                $statement->bindValue(':department_name', ucfirst($department_name));
-                $statement->bindValue(':tel_number', $tel_number);
-                $statement->bindValue(':email', $email);
+                $statement->bindValue(':department_name', ucfirst($department_name), PDO::PARAM_STR);
+                $statement->bindValue(':tel_number', $tel_number, PDO::PARAM_STR);
+                $statement->bindValue(':email', $email, PDO::PARAM_STR);
 
                 // Execute the INSERT statement.
                 $statement->execute(); 
@@ -129,18 +129,19 @@
 <head>
     <title>New Blog Post</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="blog.css" />
+    <link rel="stylesheet" type="text/css" href="edit.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <section>
-        <h1><a href="index.php">VROAR Inc.</a> - <a href="create.php?type=<?= $_GET['type'] ?>">New <?= ucfirst($_GET['type']) ?> Entry</a></h1>
-        <h3><a href="login.php">Administration Home Page</a></h3>
-    </section>
+    <header>
+        <h1><a href="index.php">VROAR Inc.</a></h1>
+        <h1 id="middle"><a href="create.php?type=<?= $_GET['type'] ?>">New <?= ucfirst($_GET['type']) ?> Entry</a></h1>
+        <h1><a href="login.php">📝</a></h1>
+    </header>
 
     <?php if($_GET['type'] == "employee"): ?>
+        <h3>List of Department IDs and Names for Employee Record</h3>
         <ul>
-            <li>List of Department IDs and Names for Employee Record</li>
             <?php while($row = $initial_statement->fetch()): ?>
                 <li><?= $row['department_id'] ?>: <?= $row['department_name'] ?></li>
             <?php endwhile ?>
@@ -151,7 +152,7 @@
 
         <?php if($_GET['type'] == "employee"): ?>
             <label for="first_name">First Name: </label>
-            <input id="first_name" name="first_name" value="<?php echo isset($_POST['first_name']) ? $_POST['first_name'] : ''; ?>">
+            <input id="first_name" name="first_name" value="<?php echo isset($_POST['first_name']) ? $_POST['first_name'] : ''; ?>" autofocus>
             <label for="last_name">Last Name: </label>
             <input id="last_name" name="last_name" value="<?php echo isset($_POST['last_name']) ? $_POST['last_name'] : ''; ?>">
             <label for="tel_number">Phone Number: </label>
@@ -167,7 +168,7 @@
             </select>
         <?php elseif($_GET['type'] == "department"): ?>
             <label for="department_name">Department Name: </label>
-            <input id="department_name" name="department_name" value="<?php echo isset($_POST['department_name']) ? $_POST['department_name'] : ''; ?>">
+            <input id="department_name" name="department_name" value="<?php echo isset($_POST['department_name']) ? $_POST['department_name'] : ''; ?>" autofocus>
             <label for="tel_number">Phone Number: </label>
             <input id="tel_number" name="tel_number" value="<?php echo isset($_POST['tel_number']) ? $_POST['tel_number'] : '1(204)'; ?>">
             <label for="email">Email: </label>

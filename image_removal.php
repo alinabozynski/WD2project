@@ -26,7 +26,7 @@
         // Build and prepare the parameterized SQL query, then bind to the above sanitized values.
         $query = "UPDATE employees SET image_file = :image_file WHERE emp_id = :emp_id LIMIT 1";
         $statement = $db->prepare($query);
-        $statement->bindValue(':image_file', $image_file);
+        $statement->bindValue(':image_file', $image_file, PDO::PARAM_STR);
         $statement->bindValue(':emp_id', $emp_id, PDO::PARAM_INT);
         
         // Execute the UPDATE.
@@ -59,7 +59,7 @@
         // Build and prepare the parameterized SQL query, then bind to the above sanitized values.
         $query = "UPDATE departments SET image_file = :image_file WHERE department_id = :department_id LIMIT 1";
         $statement = $db->prepare($query);
-        $statement->bindValue(':image_file', $image_file);
+        $statement->bindValue(':image_file', $image_file, PDO::PARAM_STR);
         $statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
         
         // Execute the INSERT.
@@ -72,20 +72,3 @@
 
     }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Delete Record</title>
-    <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="blog.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-    <section>
-        <h1><a href="index.php">VROAR Inc.</a> - <?php echo isset($_GET['emp_id']) ? "Employee" : "Department" ?> Record Image Removed</h1>
-        <h3><a href="login.php">Administration Home Page</a></h3>
-    </section>
-
-    <h2>The image for the selected record has been removed successfully.</h2>
-</body>
-</html> 

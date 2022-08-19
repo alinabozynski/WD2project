@@ -48,8 +48,8 @@
                 // Build and prepare the parameterized SQL query and bind to the above sanitized values.
                 $query = "INSERT INTO logins (username, password) VALUES (:username, :password)";        
                 $statement = $db->prepare($query); 
-                $statement->bindValue(':username', $username);
-                $statement->bindValue('password', $password);
+                $statement->bindValue(':username', $username, PDO::PARAM_STR);
+                $statement->bindValue('password', $password, PDO::PARAM_STR);
 
                 // Execute the INSERT
                 $statement->execute();
@@ -75,11 +75,13 @@
 <head>
     <title>Admin</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Shadows+Into+Light&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="home.css" />
+    <link rel="stylesheet" type="text/css" href="login_data.css" />
 </head>
 <body>
     <header>
-        <h1><a href="index.php">VROAR Inc.</a> - <a href="login.php">Administration Home Page</a></h1>
+        <h1><a href="index.php">VROAR Inc.</a></h1>
+        <h1 id="middle">Login Data</h1> 
+        <h1><a href="login.php">📝</a></h1>
     </header>
 
     <form method="POST" action="login_data.php"> 
@@ -94,11 +96,11 @@
         <input type="submit" class="submit" value="Create User" name="new_user">
     </form>
 
-    <h3>Login Data</a></h3>
+    <h3>Login Data</h3>
     <h4>Click a username or password to edit or delete that account.</h4>
     <table>
         <tr>
-            <td>Username</td>
+            <td>Username:</td>
             <td>Password</td>
         </tr>
         <?php while($row = $statement->fetch()): ?>

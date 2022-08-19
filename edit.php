@@ -36,11 +36,11 @@
         // Build and prepare the parameterized SQL query and bind to the above sanitized values.
         $query = "UPDATE employees SET first_name = :first_name, last_name = :last_name, tel_number = :tel_number, email = :email, department_id = :department_id WHERE emp_id = :emp_id LIMIT 1";
         $statement = $db->prepare($query);
-        $statement->bindValue(':first_name', $first_name);        
-        $statement->bindValue(':last_name', $last_name);
-        $statement->bindValue(':tel_number', $tel_number);
-        $statement->bindValue(':email', $email);
-        $statement->bindValue(':department_id', $department_id);
+        $statement->bindValue(':first_name', $first_name, PDO::PARAM_STR);        
+        $statement->bindValue(':last_name', $last_name, PDO::PARAM_STR);
+        $statement->bindValue(':tel_number', $tel_number, PDO::PARAM_STR);
+        $statement->bindValue(':email', $email. PDO::PARAM_STR);
+        $statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
         $statement->bindValue(':emp_id', $emp_id, PDO::PARAM_INT);
 
         // Execute the UPDATE statement.
@@ -59,9 +59,9 @@
         // Build and prepare the parameterized SQL query and bind to the above sanitized values.
         $query = "UPDATE departments SET department_name = :department_name, tel_number = :tel_number, email = :email WHERE department_id = :department_id LIMIT 1";
         $statement = $db->prepare($query);
-        $statement->bindValue(':department_name', $department_name);        
-        $statement->bindValue(':tel_number', $tel_number);
-        $statement->bindValue(':email', $email);
+        $statement->bindValue(':department_name', $department_name, PDO::PARAM_STR);        
+        $statement->bindValue(':tel_number', $tel_number, PDO::PARAM_STR);
+        $statement->bindValue(':email', $email, PDO::PARAM_STR);
         $statement->bindValue(':department_id', $department_id, PDO::PARAM_INT);
 
         // Execute the UPDATE statement.
@@ -89,7 +89,7 @@
         $employee = $statement->fetch();
 
         if($_POST){
-            echo "Update failed.";
+            echo "Update failed. Please ensure all data is valid. No fields should be left as their defaults or blank, the phone number must be 11 digits long and starting with 1(204), and the email should be a valid email address ending in '@VROAR.com'.";
         }
     } elseif(isset($_GET['department_id'])){
         // Sanitize $_GET['department_id'].
@@ -108,7 +108,7 @@
         $department = $statement->fetch();
 
         if($_POST){
-            echo "Update failed.";
+            echo "Update failed. Please ensure all data is valid. No fields should be left as their defaults or blank, the phone number must be 11 digits long and starting with 1(204), and the email should be a valid email address ending in '@VROAR.com'.";
         }
     }
 ?>
@@ -117,37 +117,43 @@
 <head>
     <title><?php echo isset($_GET['emp_id']) ? "Employee" : "Department" ?> Editting</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="blog.css" />
+    <link rel="stylesheet" type="text/css" href="edit.css" />
 </head>
 <body>
-    <section>
-        <h1><a href="index.php">VROAR Inc.</a> - Edit <?php echo isset($_GET['emp_id']) ? "Employee" : "Department" ?> Record</h1>
-        <h3><a href="login.php">Administration Home Page</a></h3>
-        <h3><a href="upload.php?<?php echo isset($_GET['emp_id']) ? "emp_id=".$_GET['emp_id'] : "department_id=".$_GET['department_id'] ?>">Upload image to the record for <i><?php echo isset($_GET['emp_id']) ? $employee['first_name']." ".$employee['last_name'] : $department['department_name'] ?></i></a></h3>
-    </section>
+    <header>
+        <h1><a href="index.php">VROAR Inc.</a></h1>
+        <h1 id="middle">Edit <i><?php echo isset($_GET['emp_id']) ? $employee['first_name'] . ' ' . $employee['last_name'] . "'s" : $department['department_name'] ?></i> Record</h1>
+        <h1><a href="login.php">📝</a></h1>
+    </header>
+
+    <div>
+        <h3><a href="upload.php?<?php echo isset($_GET['emp_id']) ? "emp_id=".$_GET['emp_id'] : "department_id=".$_GET['department_id'] ?>">Upload an image to the record for <i><?php echo isset($_GET['emp_id']) ? $employee['first_name']." ".$employee['last_name'] : $department['department_name'] ?></i></a></h3>
+        <p><i>*Note that this action replaces the current image, if there is one.</i></p>
+    </div>
 
     <?php if(isset($_GET['emp_id'])): ?>
+        <h3>List of Department IDs with Names for Employee Record Form</h3>
         <ul>
-            <li>List of Department IDs and Names for Employee Record</li>
             <?php while($row = $initial_statement->fetch()): ?>
                 <li><?= $row['department_id'] ?>: <?= $row['department_name'] ?></li>
             <?php endwhile ?>
         </ul>
-        <h4><?= $employee['first_name']?> <?= $employee['last_name'] ?>'s Current Department: <?= $employee['department_id']?></h4>
+        <h3>Update Record</h3>
+        <h4 id="current"><?= $employee['first_name']?> <?= $employee['last_name'] ?>'s Current Department: <?= $employee['department_id']?></h4>
     <?php endif ?>
 
     <?php if(!isset($_GET['emp_id']) && !isset($_GET['department_id'])): ?>
         <p>No record selected.</p>
     <?php else: ?>
-        <form method="post" action="edit.php?<?php echo isset($_GET['emp_id']) ? "emp_id=".$_GET['emp_id'] : "department_id=".$_GET['department_id'] ?>">
             
         <?php if(isset($_GET['emp_id'])): ?>
+            <form method="post" action="edit.php?emp_id=<?= $_GET['emp_id'] ?>">
                 <label for="first_name">First Name: </label>
-                <input id="first_name" name="first_name" value="<?= $employee['first_name'] ?>">
+                <input id="first_name" name="first_name" value="<?= $employee['first_name'] ?>" size=35>
                 <label for="last_name">Last Name: </label>
-                <input id="last_name" name="last_name" value="<?= $employee['last_name'] ?>">
+                <input id="last_name" name="last_name" value="<?= $employee['last_name'] ?>" size=35>
                 <label for="tel_number">Phone Number: </label>
-                <input id="tel_number" name="tel_number" value="<?= $employee['tel_number'] ?>">
+                <input id="tel_number" name="tel_number" value="<?= $employee['tel_number'] ?>" size=35>
                 <label for="email">Email: </label>
                 <input id="email" name="email" value="<?= $employee['email'] ?>" size=35>
                 <label for="department_id">Department ID: </label>
@@ -160,18 +166,20 @@
                 <input type="submit" class="submit" value="Update Record">
             </form>
 
-                <?php if($employee['image_file'] != null): ?>
+                <?php if($employee['image_file'] != null || !empty($employee['image_file'])): ?>
+                    <h3>Current attached image</h3>
                     <p><img src="uploads/<?= $employee['image_file'] ?>" alt="<?= $employee['image_file'] ?>" title="<?= $employee['image_file'] ?>" height="300"></p>
                     <p><a href="image_removal.php?emp_id=<?= $employee['emp_id'] ?>">Remove image from this record</a></p>
                 <?php endif ?>
 
-            <form method="post" action="delete.php?emp_id=<?= $_GET['emp_id'] ?>">
+            <form method="post" action="delete.php?emp_id=<?= $_GET['emp_id'] ?>" class="delete_record">
                 <input type="submit" class="submit" value="Delete Record">
             </form>
 
+            <h3>Comments</h3>
             <?php while($comments = $emp_comment_statement->fetch()): ?>
                 <?php if($comments['emp_id'] == $_GET['emp_id']): ?>
-                    <div>
+                    <div class="comments">
                         <p><?= $comments['created'] ?></p>
                         <p><?= $comments['comment'] ?></p>
                         <form method="POST" action="details.php?emp_id=<?= $_GET['emp_id'] ?>&comm_id=<?= $comments['comm_id'] ?>">
@@ -181,31 +189,36 @@
                             <input type="submit" class="submit" name="disemvowel_comment" value="Disemvowel Comment">
                         </form>
                     </div>
+                <?php else: ?>
+                    <p>No Comments for this record.</p>
                 <?php endif ?>
             <?php endwhile ?>
 
         <?php elseif(isset($_GET['department_id'])): ?>
+            <h3>Update Record</h3>
+            <form method="post" action="edit.php?department_id=<?= $_GET['department_id'] ?>">
                 <label for="department_name">Department Name: </label>
-                <input id="department_name" name="department_name" value="<?= $department['department_name'] ?>">
+                <input id="department_name" name="department_name" value="<?= $department['department_name'] ?>" size=35>
                 <label for="tel_number">Phone Number: </label>
-                <input id="tel_number" name="tel_number" value="<?= $department['tel_number'] ?>">
+                <input id="tel_number" name="tel_number" value="<?= $department['tel_number'] ?>" size=35>
                 <label for="email">Email: </label>
                 <input id="email" name="email" value="<?= $department['email'] ?>" size=35>
                 <input type="submit" class="submit" value="Update Record">
             </form>
 
-                <?php if($department['image_file'] != null): ?>
+                <?php if($department['image_file'] != null || !empty($department['image_file'])): ?>
                     <p><img src="uploads/<?= $department['image_file'] ?>" alt="<?= $department['image_file'] ?>" title="<?= $department['image_file'] ?>" height="300"></p>
                     <p><a href="image_removal.php?department_id=<?= $department['department_id'] ?>">Remove image from this record</a></p>
                 <?php endif ?>
 
-            <form method="post" action="delete.php?department_id=<?= $_GET['department_id'] ?>">
+            <form method="post" action="delete.php?department_id=<?= $_GET['department_id'] ?>" class="delete_record">
                 <input type="submit" class="submit" value="Delete Record">
             </form>
 
+            <h3>Comments</h3>
             <?php while($comments = $dept_comment_statement->fetch()): ?>
                 <?php if($comments['department_id'] == $_GET['department_id']): ?>
-                    <div>
+                    <div class="comments">
                         <p><?= $comments['created'] ?></p>
                         <p><?= $comments['comment'] ?></p>
                         <form method="POST" action="details.php?department_id=<?= $_GET['department_id'] ?>&comm_id=<?= $comments['comm_id'] ?>">
@@ -215,11 +228,11 @@
                             <input type="submit" class="submit" name="disemvowel_comment" value="Disemvowel Comment">
                         </form>
                     </div>
+                <?php else: ?>
+                    <p>No Comments for this record.</p>
                 <?php endif ?>
             <?php endwhile ?>
-
         <?php endif ?>
-    
     <?php endif ?>
 </body>
 </html> 

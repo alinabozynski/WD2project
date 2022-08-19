@@ -1,0 +1,79 @@
+/* index.php Style Sheet */
+
+*{
+	font-family: "Space Mono";
+	list-style: none;
+	text-decoration: none;
+}
+
+body{
+	max-width: 80%;
+	margin: 0% auto 3% auto;
+	padding: 0.5% 5% 3% 5%;
+	border-left: 3px solid #000;
+	border-right: 3px solid #000;
+	border-bottom: 3px solid #000;
+
+}
+
+	body header{
+		display: flex;
+		border: 3px solid #000;
+		border-radius: 15px;
+		padding: 0% 1% 0% 1%;
+		margin-top: 1%;
+	}
+
+		body header h1:first-of-type{
+			padding-right: 1.5%;
+		}
+
+			body header h1:first-of-type a{
+				font-family: "Rubik Moonrocks";
+				background-color: #909684;
+				margin-right: auto;
+				color: #000;
+			}
+
+				body header h1:first-of-type a:visited{
+					color: #000;
+				}
+
+				body header h1:first-of-type a:hover{
+					color: #696969;
+				}
+
+		body header #middle{
+			margin: auto;
+		}
+
+	body form:first-of-type{
+		border-bottom: 5px solid #909684;
+		border-left: 5px solid #909684;
+		margin-bottom: 2%;
+		margin-top: 2%;
+		background-color: #c8d0c8;
+		padding: 1% 1% 5% 1%;
+		border-radius: 15px;
+	}
+
+		body form:first-of-type input:last-of-type{
+			margin-top: 1%;
+			float: right;
+		}
+
+		body section h3{
+			border-bottom: 3px solid #000;
+			padding-bottom: 1%;
+		}
+
+	body form:last-of-type{
+		background-color: #909684;
+		border-radius: 15px;
+		padding: 1%;
+		margin: auto;
+	}
+
+		body form:last-of-type input:last-of-type{
+			margin-left: 21.5%;
+		}

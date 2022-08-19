@@ -45,10 +45,10 @@
 
         $query = "DELETE FROM logins WHERE username = :username LIMIT 1";
         $statement = $db->prepare($query);
-        $statement->bindValue(':username', $username);
+        $statement->bindValue(':username', $username, PDO::PARAM_STR);
         $statement->execute();
 
-        header("Location: delete.php?account=deleted");
+        header("Location: delete.php");
         exit();
 
     // Grab record to be deleted if emp_id is in the URL
@@ -82,15 +82,17 @@
 <head>
     <title>Delete Record</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="blog.css" />
+    <link rel="stylesheet" type="text/css" href="edit.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <section>
-        <h1><a href="index.php">VROAR Inc.</a> - <?php if(isset($_GET['account'])){ echo "Account";} else {echo isset($_GET['emp_id']) ? "Employee Record" : "Department Record";} ?> Deleted</h1>
-        <h3><a href="login.php">Administration Home Page</a></h3>
-    </section>
-
-    <h2>The selected record has been deleted successfully.</h2>
+    <header>
+        <h1><a href="index.php">VROAR Inc.</a></h1>
+        <h1 id="middle"><?php if(isset($_GET['account'])){ echo "Account";} else {echo isset($_GET['emp_id']) ? "Employee Record" : "Department Record";} ?> Deleted</h1>
+        <h1><a href="login.php">📝</a></h1>
+    </header>
+    <div>
+        <p>The selected record has been deleted successfully.</p>
+    </div>
 </body>
 </html> 

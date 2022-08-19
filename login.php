@@ -13,7 +13,7 @@
         $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $query = "SELECT * FROM logins WHERE username = :username LIMIT 1";     
         $statement = $db->prepare($query); 
-        $statement->bindValue(':username', $username);
+        $statement->bindValue(':username', $username, PDO::PARAM_STR);
         $statement->execute();
         $row = $statement->fetch();
 
@@ -42,27 +42,28 @@
     }
 
 ?>
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <title>Login</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Shadows+Into+Light&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="home.css" />
 </head>
 <body>
     <?php if(empty($_SESSION['username'])): ?>
+        <!-- Only include this stylesheet when not logged in -->
+        <link rel="stylesheet" type="text/css" href="login.css" />
         <header>
-            <h1><a href="index.php">VROAR Inc.</a></h1>
+            <h1><a href="index.php">VROAR Inc.</a> - Login</h1>
         </header>
 
+        <h3>Login</h3>
+        <h4>Enter your username and password.</h4>
         <form method="POST"> 
-            <h3>Login</h3>
             <label for="username">Username: </label>
-            <input type="text" id="username" name="username">
+            <input type="text" id="username" name="username" autofocus>
             <label for="password">Password: </label>
             <input type="password" id="password" name="password">
-
-            <input type="submit" class="submit" name="login">
+            <input type="submit" class="submit" name="login" value="Login">
         </form>
     <?php else: ?>
         <?php require('locked.php'); ?>

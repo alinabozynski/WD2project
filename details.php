@@ -66,7 +66,7 @@
         // UPDATE the current comment value to the disemvoweled version 
         $new_query = "UPDATE emp_comments SET comment = :disemvoweled WHERE comm_id = :comm_id LIMIT 1";
         $new_statement = $db->prepare($new_query);
-        $new_statement->bindValue(':disemvoweled', $disemvoweled);
+        $new_statement->bindValue(':disemvoweled', $disemvoweled, PDO::PARAM_STR);
         $new_statement->bindValue(':comm_id', $comm_id);
         $new_statement->execute();
 
@@ -93,8 +93,8 @@
         // UPDATE the current comment value to the disemvoweled version 
         $new_query = "UPDATE dept_comments SET comment = :disemvoweled WHERE comm_id = :comm_id LIMIT 1";
         $new_statement = $db->prepare($new_query);
-        $new_statement->bindValue(':disemvoweled', $disemvoweled);
-        $new_statement->bindValue(':comm_id', $comm_id);
+        $new_statement->bindValue(':disemvoweled', $disemvoweled, PDO::PARAM_STR);
+        $new_statement->bindValue(':comm_id', $comm_id, PDO::PARAM_INT);
         $new_statement->execute();
 
         // Redirect after update. 
@@ -130,8 +130,8 @@
             // Build and prepare the parameterized SQL query and bind to the above sanitized values.
             $query = "INSERT INTO emp_comments (emp_id, comment) VALUES (:emp_id, :comment)";
             $statement = $db->prepare($query); 
-            $statement->bindValue(':emp_id', $emp_id);
-            $statement->bindValue(':comment', $comment);
+            $statement->bindValue(':emp_id', $emp_id, PDO::PARAM_INT);
+            $statement->bindValue(':comment', $comment, PDO::PARAM_STR);
 
             // Execute the INSERT statement.
             $statement->execute(); 
@@ -149,8 +149,8 @@
             // Build and prepare the parameterized SQL query and bind to the above sanitized values.
             $query = "INSERT INTO dept_comments (department_id, comment) VALUES (:department_id, :comment)";
             $statement = $db->prepare($query); 
-            $statement->bindValue(':department_id', ucfirst($department_id));
-            $statement->bindValue(':comment', $comment);
+            $statement->bindValue(':department_id', ucfirst($department_id),PDO::PARAM_INT);
+            $statement->bindValue(':comment', $comment, PDO::PARAM_STR);
 
             // Execute the INSERT statement.
             $statement->execute(); 
@@ -224,14 +224,17 @@
     <head>
         <title><?= $employee['first_name'] ?> <?= $employee['last_name'] ?></title>
         <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Shadows+Into+Light&family=Space+Mono' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" type="text/css" href="blog.css" />
+        <link rel="stylesheet" type="text/css" href="details.css" />
     </head>
     <body>
-        <section>
-            <h1><a href="index.php">VROAR Inc.</a> - <?= $employee['first_name'] ?> <?= $employee['last_name'] ?></h1>
-            <h3><a href="index.php">Home</a></h3>
-            <h3><a href="login.php">📝</a></h3>
-        </section>
+        <header>
+            <h1><a href="index.php">VROAR Inc.</a></h1>
+            <h1 id="middle"><?= $employee['first_name'] ?> <?= $employee['last_name'] ?></h1>
+            <h1><a href="login.php">📝</a></h1>
+        </header>
+
+        <h3>Employee Information</h3>
+
         <div>
             <p><b>Employee Name: </b><?= $employee['first_name'] ?> <?= $employee['last_name'] ?></p>
             <p><b>Department: </b><?= $department['department_name'] ?></p>
@@ -243,17 +246,18 @@
             <?php endif ?>
         </div>
 
+        <h3>Comments</h3>
+
         <form method="POST" action="details.php?emp_id=<?= $_GET['emp_id'] ?>">
-            <h3>Add comments about this employee</h3>
-            <label for="comment">Comments</label>
-            <input type="text" id="comment" name="comment" value="<?php echo isset($_POST['comment']) ? $_POST['comment'] : ''; ?>">
+            <h3>Add a comment about this employee</h3>
+            <textarea rows=3 cols=110 id="comment" name="comment" value="<?php echo isset($_POST['comment']) ? $_POST['comment'] : ''; ?>"></textarea>
             <input type="submit" class="submit" name="add_comment" value="Add Comment">
         </form>
 
         <?php while($comments = $emp_comment_statement->fetch()): ?>
             <?php if($comments['emp_id'] == $_GET['emp_id']): ?>
-                <div>
-                    <p><?= $comments['created'] ?></p>
+                <div class="comments">
+                    <p>Posted on: <?= $comments['created'] ?></p>
                     <p><?= $comments['comment'] ?></p>
                 </div>
             <?php endif ?>
@@ -265,14 +269,17 @@
     <head>
         <title><?= $department['department_name'] ?></title>
         <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Shadows+Into+Light&family=Space+Mono' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" type="text/css" href="blog.css" />
+        <link rel="stylesheet" type="text/css" href="details.css" />
     </head>
     <body>
-        <section>
-            <h1><a href="index.php">VROAR Inc.</a> - <?= $department['department_name'] ?></h1>
-            <h3><a href="index.php">Home</a></h3>
-            <h3><a href="login.php">📝</a></h3>
-        </section>
+        <header>
+            <h1><a href="index.php">VROAR Inc.</a></h1>
+            <h1 id="middle"><?= $department['department_name'] ?></h1>
+            <h1><a href="login.php">📝</a></h1>
+        </header>
+
+        <h3>Department Information</h3>
+
         <div>
             <p><b>Department Name: </b><?= $department['department_name'] ?></p>
             <p><b>Phone: </b><?= $department['tel_number'] ?></p>
@@ -283,24 +290,26 @@
             <?php endif ?>
         </div>
 
-        <div>
-            <h3>Employees in this department:</h3>
+        <h3 id="emp_title">Employees in this department:</h3>
+
+        <div id="employees">
             <?php while($employee_info = $statement2->fetch()): ?>
                 <p><a href="details.php?emp_id=<?= $employee_info['emp_id'] ?>"><?= $employee_info['first_name'] ?> <?= $employee_info['last_name'] ?></a></p>
             <?php endwhile ?>
         </div>
 
+        <h3>Comments</h3>
+
         <form method="POST" action="details.php?department_id=<?= $_GET['department_id'] ?>">
-            <h3>Add comments about this department</h3>
-            <label for="comment">Comments</label>
-            <input type="text" id="comment" name="comment" value="<?php echo isset($_POST['comment']) ? $_POST['comment'] : ''; ?>">
+            <h3>Add a comment about this department</h3>
+            <textarea rows=3 cols=110 id="comment" name="comment" value="<?php echo isset($_POST['comment']) ? $_POST['comment'] : ''; ?>"></textarea>
             <input type="submit" class="submit" name="add_comment" value="Add Comment">
         </form>
 
         <?php while($comments = $dept_comment_statement->fetch()): ?>
             <?php if($comments['department_id'] == $_GET['department_id']): ?>
-                <div>
-                    <p><?= $comments['created'] ?></p>
+                <div class="comments">
+                    <p>Posted on: <?= $comments['created'] ?></p>
                     <p><?= $comments['comment'] ?></p>
                 </div>
             <?php endif ?>

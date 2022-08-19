@@ -1,0 +1,114 @@
+/* edit.php, delete.php, image_removal.php and create.php Style Sheet */
+
+*{
+	font-family: "Space Mono";
+	list-style: none;
+	text-decoration: none;
+}
+
+body{
+	max-width: 80%;
+	margin: 0% auto 3% auto;
+	padding: 0.5% 5% 3% 5%;
+	border-left: 3px solid #000;
+	border-right: 3px solid #000;
+	border-bottom: 3px solid #000;
+}
+
+	body header{
+		display: flex;
+		border: 3px solid #000;
+		border-radius: 15px;
+		padding: 0% 1% 0% 1%;
+		align-items: center;
+	}
+
+		body header h1:first-of-type{
+			padding-right: 0%;
+		}
+
+		body header #middle{
+			margin: auto;
+		}
+
+			body header a{
+				color: #000;
+			}
+
+			body header a:visited{
+				color: #000;
+			}
+
+			body header h1:first-of-type a{
+				font-family: "Rubik Moonrocks";
+				background-color: #909684;
+				color: #000;
+			}
+
+				body header h1:first-of-type a:hover{
+					color: #696969;
+				}
+
+	body > h3{
+		border-bottom: 3px solid #000;
+		padding-bottom: 1%;
+	}
+
+	body ul{
+		margin-bottom: 4%;
+	}
+
+	body #current{
+		background-color: #c8d0c8;
+		border-radius: 15px;
+		padding: 0.5%;
+	}
+
+	body div:not(#employees){
+		background-color: #c8d0c8;
+		border-radius: 15px;
+	}
+
+	#emp_title{
+		padding-top: 4%;
+	}
+
+	body div:first-of-type{
+		padding: 1%;
+		margin: 2% 0% 2% 0%;
+		border-bottom: 5px solid #909684;
+		border-left: 5px solid #909684;
+		margin-bottom: 4%;
+	}
+
+	body .comments{
+		padding: 1%;
+		margin: 2%;
+	}
+
+	body > form:first-of-type{
+		background-color: #c8d0c8;
+		border-bottom: 5px solid #909684;
+		border-left: 5px solid #909684;
+		border-radius: 15px;
+		padding: 0.5%;
+	}
+
+	body form:first-of-type label{
+		display: block;
+		padding-top: 1%;
+	}
+
+	body form:first-of-type input:last-of-type{
+		margin-bottom: 2%;
+	}
+
+	body .delete_record input{
+		width: 100%;
+		background-color: #ffb0b0;
+		margin-bottom: 3%;
+	}
+
+		body .delete_record input:hover{
+			background-color: #ff5a5a;
+		}

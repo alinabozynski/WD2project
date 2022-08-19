@@ -54,36 +54,36 @@
 <head>
     <title>Admin</title>
     <link href='https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap&family=Shadows+Into+Light&family=Space+Mono' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="home.css" />
+    <link rel="stylesheet" type="text/css" href="locked.css" />
 </head>
 <body>
     <header>
-        <h1><a href="index.php">VROAR Inc.</a> - <a href="login.php">Administration Home Page</a></h1>
-
+        <h1><a href="index.php">VROAR Inc.</a></h1>
+        <h1><a href="login.php">Admin Home Page</a></h1>
         <h3><a href="login_data.php">View Login Data</a></h3>
-
         <form method="POST" action="login.php">
             <input type="submit" class="submit" name="logout" value="Logout">
         </form>
-
-        <h3>Data Management</h3>
     </header>
+
+    <h2>Data Management</h2>
     <div>
+        <h3><b>Enter Data</b></h3>
         <ul>
-            <li><b>Create Data</b></li>
             <li><a href="create.php?type=employee">Create a new employee record</a></li>
             <li><a href="create.php?type=department">Create a new department record</a></li>
         </ul>
     </div>
-    <form method="POST" action="locked.php">
-        <label for="sort"></label>
+
+    <h2>Editting Data</h2>
+    <form method="POST" action="locked.php" id="sort_form">
         <select id="sort" name="sort">
             <option value="last_name">Order by last name</option>
             <option value="first_name">Order by first name</option>
             <option value="created_date">Order by most recent creation date</option>
             <option value="updated_date">Order by most recently updated</option>
         </select>
-        <input type="submit" class="submit" value="Sort" name="sort_request">
+        <input type="submit" class="submit" value="Sort" name="sort_request" id="sort_submit">
     </form>
     <div>
         <?php if(isset($_POST['sort_request'])): ?>
@@ -91,21 +91,21 @@
         <?php endif ?>
         <p><i>*Note that ordering by employee first or last name orders the departments by name as well.</i></p>
     </div>
-    <div>
+    <section>
+        <h3><b>Edit or Delete a current employee record and comments</b></h3>
         <ul>
-            <li><b>Edit or Delete a current employee record and comments</b></li>
             <?php while($row = $statement->fetch()): ?>
                 <li><a href="edit.php?emp_id=<?= $row['emp_id'] ?>"><?= $row['last_name'] ?>, <?= $row['first_name'] ?></a></li>
             <?php endwhile ?>
         </ul>
-    </div>
-    <div>
+    </section>
+    <section>
+        <h3><b>Edit or Delete a current department record and comments</b></h3>
         <ul>
-            <li><b>Edit or Delete a current department record and comments</b></li>
             <?php while($row = $statement2->fetch()): ?>
                 <li><a href="edit.php?department_id=<?= $row['department_id'] ?>"><?= $row['department_name'] ?></a></li>
             <?php endwhile ?>
         </ul>
-    </div>
+    </section>
 </body>
 </html> 
