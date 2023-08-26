@@ -1,4 +1,4 @@
-# Web Development 2 project
+# Web Development 2 Project - Content Management System
 Used the basic AMP stack - Apache as the web server, MySQL/MariaDB for the database, and PHP for the programming language. 
 
 Download Xampp for Windows [here](https://www.apachefriends.org/download.html).
