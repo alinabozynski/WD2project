@@ -1,9 +1,18 @@
 # Web Development 2 Project - Content Management System
-Used the basic AMP stack - Apache as the web server, MySQL/MariaDB for the database, and PHP for the programming language. 
+Used the basic AMP stack - Apache as the web server, MySQL/MariaDB for the database, and PHP for the programming language. \
+A proposal was written for this project, including a name and description of a fictional business and why they require a CMS, as well as a description of the database with names of tables, why each table is required, and descriptions of associations between the tables. 
 
-Download Xampp for Windows [here](https://www.apachefriends.org/download.html).
+## Main Project Features
+* Validations when creating/updating pages
+* Sanitized strings retrieved from GET or POST parameters to prevent HTML injection attacks
+* Images may be added/removed to pages when editting by way of form upload
+* Only admins can perform CUD (create, update, delete) tasks
+* Passwords are stored encrypted (hashed and salted)
+* Admin services can be accessed by creating an account (or existing admin credentials to use to login are example / password)
 
 ## Configuring Xampp 
+Download Xampp for Windows [here](https://www.apachefriends.org/download.html).
+
 By default, Apache is configured to communicate using TCP/IP port 80, but if you already have an existing web server running on that port, change the port used by Apache.
 
 To do this, click on the "config" button in the Xampp Control Panel, beside Apache under Actions.
